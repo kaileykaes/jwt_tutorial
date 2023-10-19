@@ -1,5 +1,5 @@
 import { Router } from 'oak';
-import { signin, signup } from '../controllers/users.ts';
+import { authorized } from '../middlewares/isAuthorized.ts';
 import {
   create,
   deleteTask,
@@ -7,7 +7,7 @@ import {
   getTasks,
   updateById,
 } from '../controllers/tasks.ts';
-import { authorized } from '../middlewares/isAuthorized.ts';
+import { signin, signup } from '../controllers/users.ts';
 
 const router = new Router();
 

@@ -1,6 +1,6 @@
-import { verify } from 'djwt';
-import { key } from '../utils/apiKey.ts';
 import { Context } from 'oak';
+import { key } from '../utils/apiKey.ts';
+import { verify } from 'djwt';
 
 export const authorized = async (ctx: Context, next: any) => {
   try {
