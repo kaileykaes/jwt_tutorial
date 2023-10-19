@@ -1,6 +1,7 @@
-// import { ObjectId } from "https://deno.land/x/mongo@v0.30.0/mod.ts";
+import { ObjectId } from 'mongo';
 
 export interface TaskSchema {
+  _id?: ObjectId;
   name: string;
   isCompleted: boolean;
 }
