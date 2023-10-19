@@ -19,7 +19,7 @@
     "rules": {
       "tags": ["fresh", "recommended"],
       "exclude": [
-        "no-explicit-any" // Until all `any`'s are removed
+        // "no-explicit-any" // Until all `any`'s are removed
       ],
       "include": [
         // All non-recommended rules should be mentioned here
