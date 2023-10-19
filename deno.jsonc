@@ -1,0 +1,57 @@
+{
+  "lock": false,
+  "tasks": {
+    "check": "deno fmt --check && deno lint && deno check **/*.ts",
+    "start": "deno run --watch=src/ --allow-net app.ts",
+    "update": "udd deno.jsonc"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": true,
+    "proseWrap": "preserve",
+    "exclude": ["woords/phdef.js"]
+  },
+  "lint": {
+    "exclude": ["woords/phdef.js"],
+    "rules": {
+      "tags": ["fresh", "recommended"],
+      "exclude": [
+        "no-explicit-any" // Until all `any`'s are removed
+      ],
+      "include": [
+        // All non-recommended rules should be mentioned here
+        "ban-untagged-todo",
+        "camelcase",
+        "default-param-last",
+        "eqeqeq",
+        // "explicit-function-return-type", figure out JSX first
+        // "explicit-module-boundary-types", figure out JSX first
+        "guard-for-in",
+        "no-await-in-loop",
+        "no-const-assign",
+        "no-eval",
+        "no-external-import",
+        "no-implicit-declare-namespace-export",
+        "no-non-null-asserted-optional-chain",
+        "no-sparse-arrays",
+        "no-sync-fn-in-async-fn",
+        "no-throw-literal"
+        // "no-top-level-await", disagree
+        // "no-undef", disagree
+        // "prefer-ascii", disagree
+        // "prefer-primordials", disagree
+        // "single-var-declarator", undocumented
+        // "triple-slash-reference", undocumented
+      ]
+    }
+  },
+  "imports": {
+    "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
+    "djwt": "https://deno.land/x/djwt@v2.4/mod.ts",
+    "mongo": "https://deno.land/x/mongo@v0.32.0/mod.ts",
+    "oak": "https://deno.land/x/oak@v12.6.1/mod.ts"
+  }
+}

@@ -1,7 +1,7 @@
-import { ObjectId } from "https://deno.land/x/mongo@v0.30.0/mod.ts";
+import { ObjectId } from 'mongo';
 
 export interface UserSchema {
-  _id: ObjectId;
+  _id?: ObjectId;
   username: string;
   password: string;
 }
