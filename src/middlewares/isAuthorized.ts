@@ -2,7 +2,7 @@ import { Context } from 'oak';
 import { key } from '../utils/apiKey.ts';
 import { verify } from 'djwt';
 
-export const authorized = async (ctx: Context, next: any) => {
+export const authorized = async (ctx: Context, next: unknown) => {
   try {
     const headers: Headers = ctx.request.headers;
     const authorization = headers.get('Authorization');

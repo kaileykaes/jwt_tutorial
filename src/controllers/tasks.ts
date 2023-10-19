@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongo';
-import { Response, Request } from 'oak';
+import { Request, Response } from 'oak';
 import { TaskSchema } from '../schema/task.ts';
 import db from '../database/connectBD.ts';
 
 const tasks = db.collection<TaskSchema>('tasks');
 
 export const create = async (
-  { request, response }: { request: any; response: any },
+  { request, response }: { request: Request; response: Response },
 ) => {
   const { name, isCompleted } = await request.body().value;
 
@@ -22,7 +22,7 @@ export const create = async (
   };
 };
 
-export const getTasks = async ({ response }: { response: any }) => {
+export const getTasks = async ({ response }: { response: Response }) => {
   const allTasks = await tasks.find({}).toArray();
 
   response.status = 200;
@@ -34,7 +34,7 @@ export const getById = async ({
   response,
 }: {
   params: { taskId: string };
-  response: any;
+  response: Response;
 }) => {
   const taskId = params.taskId;
   const task = await tasks.findOne({ _id: new ObjectId(taskId) });
@@ -53,8 +53,8 @@ export const updateById = async ({
   response,
 }: {
   params: { taskId: string };
-  request: any;
-  response: any;
+  request: Request;
+  response: Response;
 }) => {
   const taskId = params.taskId;
   const { name, isCompleted } = await request.body().value;
@@ -71,7 +71,7 @@ export const deleteTask = async ({
   response,
 }: {
   params: { taskId: string };
-  response: any;
+  response: Response;
 }) => {
   const taskId = params.taskId;
   const task = await tasks.deleteOne({ _id: new ObjectId(taskId) });

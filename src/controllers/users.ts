@@ -1,5 +1,6 @@
 import { create } from 'djwt';
 import { key } from '../utils/apiKey.ts';
+import { Request, Response } from 'oak';
 import { UserSchema } from '../schema/user.ts';
 import * as bcrypt from 'bcrypt';
 import db from '../database/connectBD.ts';
@@ -8,7 +9,7 @@ const Users = db.collection<UserSchema>('users');
 
 //create a user
 export const signup = async (
-  { request, response }: { request: any; response: any },
+  { request, response }: { request: Request; response: Response },
 ) => {
   const { username, password } = await request.body().value;
   const salt = await bcrypt.genSalt(8);
@@ -24,7 +25,7 @@ export const signup = async (
 
 //sign in a user
 export const signin = async (
-  { request, response }: { request: any; response: any },
+  { request, response }: { request: Request; response: Response },
 ) => {
   const body = await request.body();
   const { username, password } = await body.value;
