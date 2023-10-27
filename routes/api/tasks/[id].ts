@@ -19,7 +19,7 @@ export const handler: Handlers<Task | null> = {
     const task = await tasks.updateOne({ _id: new ObjectId(taskId) }, {
       $set: { name: name, isCompleted: isCompleted },
     });
-    // response.status = 200;
+    response.status = 200;
     const body = { message: 'Updated task', task: task };
     return new Response(JSON.stringify(body))
   },
