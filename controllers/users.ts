@@ -2,7 +2,7 @@ import db from '../database/connectBD.ts';
 import * as bcrypt from 'bcrypt';
 import { UserSchema } from '../schema/user.ts';
 import { create } from 'djwt';
-import { key } from '../utils/apiKey.ts';
+import { key } from '../utils/apiKey.ts'
 
 const Users = db.collection<UserSchema>('users');
 
