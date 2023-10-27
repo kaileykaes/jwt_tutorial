@@ -9,7 +9,6 @@ const users = db.collection<UserSchema>('users');
 
 export const handler:Handler<User | null> = {
   async POST(req: Request, ctx: Context) {
-    const body = await req.json();
     const username = await ctx.params.username;
     const password = await ctx.params.password;
     const user = await users.findOne({ username });
@@ -22,6 +21,7 @@ export const handler:Handler<User | null> = {
     const confirmPassword = await bcrypt.compare(password, user.password);
 
     if (!confirmPassword) {
+      // research & add error handling for response status (currently 200) EEP!
       const body = { message: 'Incorrect password' };
       return new Response(JSON.stringify(body));
     };
@@ -41,6 +41,7 @@ export const handler:Handler<User | null> = {
         token: jwt,
       };
     } else {
+      // research & add error handling for response status here too
       const body = {
         message: 'internal server error',
       };
