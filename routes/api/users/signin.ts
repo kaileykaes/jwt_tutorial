@@ -40,6 +40,7 @@ export const handler:Handlers<User | null> = {
         username: user.username,
         token: jwt,
       };
+      return new Response(JSON.stringify(body));
     } else {
       // research & add error handling for response status here too
       const body = {
