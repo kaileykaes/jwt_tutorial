@@ -7,8 +7,8 @@ import { key } from '../../../utils/apiKey.ts';
 
 const users = db.collection<UserSchema>('users');
 
-export const handler:Handler<User | null> = {
-  async POST(req: Request, ctx: Context) {
+export const handler:Handlers<User | null> = {
+  async POST(_req: Request, ctx: Context) {
     const username = await ctx.params.username;
     const password = await ctx.params.password;
     const user = await users.findOne({ username });
