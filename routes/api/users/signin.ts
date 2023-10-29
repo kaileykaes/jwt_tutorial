@@ -1,4 +1,4 @@
-import { Handlers } from "$fresh/server.ts";
+import { Handlers, HandlerContext } from "$fresh/server.ts";
 import db from '../../../database/connectBD.ts';
 import { UserSchema } from '../../../schema/user.ts';
 import { create } from 'djwt';
@@ -7,10 +7,13 @@ import { key } from '../../../utils/apiKey.ts';
 
 const users = db.collection<UserSchema>('users');
 
-export const handler:Handlers<User | null> = {
-  async POST(_req: Request, ctx: Context) {
-    const username = await ctx.params.username;
-    const password = await ctx.params.password;
+export const handler:Handlers<UserSchema | null> = {
+  async POST(req: Request, ctx: HandlerContext<UserSchema | null>) {
+    const {username, password} = await req.json();
+    if (!username || !password) {
+      // TODO(kaileykaes): better error
+      throw new Error("Invalid request")
+    }
     const user = await users.findOne({ username });
 
     if (!user) {
