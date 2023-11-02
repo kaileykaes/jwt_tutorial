@@ -6,12 +6,6 @@ import * as bcrypt from 'bcrypt';
 const users = db.collection<UserSchema>('users');
 
 export const handler: Handlers<User | null> = {
-  async GET(_req, _ctx) {
-    const allUsers = await users.find({}).toArray();
-    const body = { users: allUsers };
-    return new Response(JSON.stringify(body));
-  },
-
   async POST(req, _ctx) {
     const {username, password} = (await req.json());
     const salt = await bcrypt.genSalt(8);
