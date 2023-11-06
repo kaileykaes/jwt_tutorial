@@ -16,7 +16,7 @@ export const handler:Handlers<UserSchema | null> = {
     const user = await users.findOne({ username });
 
     if (!user) {
-      return new Response(`user "${username}" not found`, {
+      return new Response(JSON.stringify({message: `User "${username}" not found`}), {
         status: 404,
         statusText: 'Resource not found'
       });
@@ -24,7 +24,7 @@ export const handler:Handlers<UserSchema | null> = {
     // TODO(kaileykaes): better error
     const confirmPassword = await bcrypt.compare(password, user.password);
     if (!confirmPassword) {
-      return new Response(`Bad credentials`, {
+      return new Response(JSON.stringify({message: 'Bad credentials'}), {
         status: 401,
         statusText: 'Unauthorized'
       });
@@ -40,11 +40,10 @@ export const handler:Handlers<UserSchema | null> = {
 
     if (jwt) {
       const body = {
-        userId: user._id,
         username: user.username,
+        userId: user._id,
         token: jwt,
       };
-      console.log(4, ctx.render)
       return new Response(JSON.stringify(body));
     } else {
       // research & add error handling for response status here too
