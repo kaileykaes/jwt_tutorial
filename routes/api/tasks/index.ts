@@ -1,12 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
 import db from '../../../database/connectBD.ts';
 import { TaskSchema } from '../../../schema/task.ts';
-import { authorized } from '../../../middlewares/isAuthorized.ts'
 
 const tasks = db.collection<TaskSchema>('tasks');
 
 export const handler: Handlers<Task | null> = {
-  async GET(_req, _ctx) { 
+  async GET(_req, _ctx) {
     const allTasks = await tasks.find({}).toArray();
     const body = { tasks: allTasks.map };
     console.log(body)
