@@ -1,16 +1,14 @@
-import { Handlers, HandlerContext, Status } from "$fresh/server.ts";
+import { Handlers, HandlerContext } from "$fresh/server.ts";
 import db from '../../../database/connectBD.ts';
 import { UserSchema } from '../../../schema/user.ts';
 import { create } from 'djwt';
 import * as bcrypt from 'bcrypt';
 import { key } from '../../../utils/apiKey.ts';
-import { authorized } from '../../../middlewares/isAuthorized.ts';
-import { isErrorStatus } from 'https://deno.land/std@0.200.0/http/http_status.ts';
 
 const users = db.collection<UserSchema>('users');
 
 export const handler:Handlers<UserSchema | null> = {
-  async POST(req: Request, ctx: HandlerContext<UserSchema | null>) {
+  async POST(req: Request, _ctx: HandlerContext<UserSchema | null>) {
     const {username, password} = await req.json();
 
     const user = await users.findOne({ username });
@@ -21,7 +19,6 @@ export const handler:Handlers<UserSchema | null> = {
         statusText: 'Resource not found'
       });
     };
-    // TODO(kaileykaes): better error
     const confirmPassword = await bcrypt.compare(password, user.password);
     if (!confirmPassword) {
       return new Response(JSON.stringify({message: 'Bad credentials'}), {
@@ -46,11 +43,10 @@ export const handler:Handlers<UserSchema | null> = {
       };
       return new Response(JSON.stringify(body));
     } else {
-      // research & add error handling for response status here too
-      const body = {
-        message: 'internal server error',
-      };
-    return new Response(JSON.stringify(body));
+      return new Response(JSON.stringify({message: "I'm a teapot"}), {
+        status: 418,
+        statusText: "I'm a teapot"
+      });
     };
   }
 };
