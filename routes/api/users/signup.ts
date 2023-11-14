@@ -1,9 +1,8 @@
 import { Handlers } from '$fresh/server.ts';
-import type { UserSchema } from '../../../schema/user.ts';
 import { User } from '../../../database/user.ts';
 import * as bcrypt from 'bcrypt';
 
-export const handler: Handlers<UserSchema | null> = {
+export const handler: Handlers = {
   async POST(req, _ctx) {
     let status = 400;
     let statusText = '';

@@ -1,16 +1,13 @@
-import { kv } from './connectDB.ts';
-import { monotonicFactory } from 'ulid';
 import { StoredUserSchema, UserSchema } from '../schema/user.ts';
+import { Keyed } from './keyed.ts';
 
-const ulid = monotonicFactory();
-
-export class User {
+export class User extends Keyed {
   static async create(state: UserSchema): Promise<StoredUserSchema> {
     if (!state.password || !state.name) {
       throw new RangeError('Password required for user');
     }
 
-    const id = state.id ?? ulid();
+    const id = state.id ?? this.id();
     const actual: StoredUserSchema = {
       id,
       name: state.name,
@@ -19,7 +16,7 @@ export class User {
     };
 
     // TODO(hildjj): ensure no user names are on the block list (e.g. "root")
-    const res = await kv.atomic()
+    const res = await this.kv.atomic()
       .check({ key: ['users', id], versionstamp: null })
       .check({ key: ['users', 'name', state.name], versionstamp: null })
       .set(['users', id], actual)
@@ -32,7 +29,7 @@ export class User {
   }
 
   static async readByName(name: string): Promise<StoredUserSchema | null> {
-    const res = await kv.get<StoredUserSchema>(['users', 'name', name]);
+    const res = await this.kv.get<StoredUserSchema>(['users', 'name', name]);
     return res.value;
   }
 }

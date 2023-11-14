@@ -1,305 +1,393 @@
 {
-	"info": {
-		"_postman_id": "ad627a07-a9fc-4870-a99f-aa1b3f5d2d03",
-		"name": "jwt_tutorial",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "30609626"
-	},
-	"item": [
-		{
-			"name": "Create user",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/users/signup",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"users",
-						"signup"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Signin",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const jsonResponse = pm.response.json();",
-							"pm.globals.set(\"token\", jsonResponse.token);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/users/signin",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"users",
-						"signin"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "create task",
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{token}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"name\": \"foo\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/tasks/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"tasks",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get all tasks",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const jsonResponse = pm.response.json();",
-							"if (jsonResponse.length > 0) {",
-							"    pm.globals.set(\"taskID\", jsonResponse[0].id);",
-							"}"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "",
-						"type": "text",
-						"disabled": true
-					},
-					{
-						"key": "",
-						"value": "",
-						"type": "text",
-						"disabled": true
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"joe\",\n    \"password\": \"test\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/tasks/",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"tasks",
-						""
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "get task",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"{{taskID}}\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/tasks/{{taskID}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"tasks",
-						"{{taskID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "delete task",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"{{taskID}}\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/tasks/{{taskID}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"tasks",
-						"{{taskID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "update task",
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"id\": \"{{taskID}}\",\n    \"isCompleted\": true\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:{{port}}/api/tasks/{{taskID}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "{{port}}",
-					"path": [
-						"api",
-						"tasks",
-						"{{taskID}}"
-					]
-				}
-			},
-			"response": []
-		}
-	],
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{token}}",
-				"type": "string"
-			}
-		]
-	},
-	"event": [
-		{
-			"listen": "prerequest",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		},
-		{
-			"listen": "test",
-			"script": {
-				"type": "text/javascript",
-				"exec": [
-					""
-				]
-			}
-		}
-	]
+  "info": {
+    "_postman_id": "ad627a07-a9fc-4870-a99f-aa1b3f5d2d03",
+    "name": "jwt_tutorial",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30609626"
+  },
+  "item": [
+    {
+      "name": "Create user",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/users/signup",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "users",
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Signin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonResponse = pm.response.json();",
+              "pm.environment.set('token', jsonResponse.token);",
+              "pm.environment.set('refreshToken', jsonResponse.refreshToken);",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/users/signin",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "users",
+            "signin"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "create task",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"name\": \"foo3\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/tasks/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "tasks",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get all tasks",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonResponse = pm.response.json();",
+              "if (jsonResponse.length > 0) {",
+              "    pm.globals.set(\"taskID\", jsonResponse[0].id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          },
+          {
+            "key": "",
+            "value": "",
+            "type": "text",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"joe\",\n    \"password\": \"test\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/tasks/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "tasks",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "get task",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"id\": \"{{taskID}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/tasks/{{taskID}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "tasks",
+            "{{taskID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "delete task",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"id\": \"{{taskID}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/tasks/{{taskID}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "tasks",
+            "{{taskID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "update task",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"id\": \"{{taskID}}\",\n    \"isCompleted\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/tasks/{{taskID}}",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "tasks",
+            "{{taskID}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "refresh token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const jsonResponse = pm.response.json();",
+              "pm.environment.set('token', jsonResponse.token);",
+              "pm.environment.set('refreshToken', jsonResponse.refreshToken);",
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"refreshToken\": \"{{refreshToken}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:{{port}}/api/users/refresh",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "users",
+            "refresh"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Logout all sessions",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:{{port}}/api/sessions/logout",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "sessions",
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List all sessions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:{{port}}/api/sessions/",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "{{port}}",
+          "path": [
+            "api",
+            "sessions",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
 }

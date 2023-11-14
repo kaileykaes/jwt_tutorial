@@ -1,12 +1,19 @@
-import { HandlerContext, Handlers } from '$fresh/server.ts';
-import type { State, UserSchema } from '../../../schema/user.ts';
-import { create } from 'djwt';
+import { Handlers } from '$fresh/server.ts';
+import type { State } from '../../../schema/user.ts';
 import * as bcrypt from 'bcrypt';
-import { key } from '../../../utils/apiKey.ts';
+import { key, refreshKey } from '../../../utils/apiKey.ts';
+import { RefreshToken } from '../../../database/refreshToken.ts';
+import { RefreshTokenSchema } from '../../../schema/refreshToken.ts';
+import { Token } from '../../../controllers/token.ts';
 import { User } from '../../../database/user.ts';
+import {
+  AUTH_DURATION,
+  CLOCK_SKEW,
+  REFRESH_DURATION,
+} from '../../../utils/config.ts';
 
 export const handler: Handlers = {
-  async POST(req: Request, _ctx: HandlerContext) {
+  async POST(req, ctx) {
     let status = 401;
     let statusText = 'Unauthorized';
 
@@ -15,25 +22,36 @@ export const handler: Handlers = {
       const user = await User.readByName(name);
       if (user) {
         if (await bcrypt.compare(password, user.password)) {
-          const now = Math.round(new Date().valueOf() / 1000);
+          const now = Math.round(new Date().valueOf() / 1000) - CLOCK_SKEW;
           const payload: State = {
+            jti: RefreshToken.id(), // For both tokens in the pair
+            iss: new URL('/', req.url).toString(),
             sub: user.id,
             name: user.name,
             roles: user.roles,
             nbf: now,
-            exp: now + 3600, // Good for 1h in seconds
+            exp: now + AUTH_DURATION,
           };
 
-          const token = await create(
-            { alg: 'HS256', typ: 'JWT' },
-            payload,
-            key,
-          );
-          if (token) {
+          const authToken = await new Token({ payload }).create(key);
+          const refreshPayload: RefreshTokenSchema = {
+            ...payload,
+            clientIP: ctx.remoteAddr.hostname,
+            exp: now + REFRESH_DURATION,
+          };
+          const refreshToken = await new Token({ payload: refreshPayload })
+            .create(refreshKey);
+
+          await RefreshToken.create(refreshPayload);
+
+          if (authToken && refreshToken) {
             return new Response(JSON.stringify({
               name: user.name,
               userId: user.id,
-              token,
+              token: authToken,
+              duration: AUTH_DURATION,
+              refreshToken,
+              refreshDuration: REFRESH_DURATION,
             }));
           }
 
@@ -41,11 +59,10 @@ export const handler: Handlers = {
           statusText = 'Internal server erorr';
         }
       }
-
-      return new Response(null, {
-        status,
-        statusText,
-      });
     }
+    return new Response(null, {
+      status,
+      statusText,
+    });
   },
 };

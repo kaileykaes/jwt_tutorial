@@ -3,6 +3,7 @@ import { IS_BROWSER } from '$fresh/runtime.ts';
 
 export function Button(props: JSX.HTMLAttributes<HTMLButtonElement>) {
   return (
+    // @ts-ignore Don't understand this yet
     <button
       {...props}
       disabled={!IS_BROWSER || props.disabled}

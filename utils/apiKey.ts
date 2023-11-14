@@ -3,3 +3,9 @@ export const key = await crypto.subtle.generateKey(
   true,
   ['sign', 'verify'],
 );
+
+export const refreshKey = await crypto.subtle.generateKey(
+  { name: 'HMAC', hash: 'SHA-512' },
+  true,
+  ['sign', 'verify'],
+);

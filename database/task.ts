@@ -1,12 +1,10 @@
-import { kv } from './connectDB.ts';
-import { monotonicFactory } from 'ulid';
 import { StoredTaskSchema, TaskSchema } from '../schema/task.ts';
+import { Keyed } from './keyed.ts';
 
-const ulid = monotonicFactory();
-
-export class Task {
+export class Task extends Keyed {
+  public static root: Deno.KvKey = ['tasks'];
   static async create(task: TaskSchema): Promise<StoredTaskSchema> {
-    const id = task.id ?? ulid();
+    const id = task.id ?? this.id();
     const actual: StoredTaskSchema = {
       id,
       userId: task.userId,
@@ -14,9 +12,10 @@ export class Task {
       isCompleted: task.isCompleted ?? false,
     };
 
-    const res = await kv.atomic()
-      .check({ key: ['tasks', task.userId, id], versionstamp: null })
-      .set(['tasks', task.userId, id], actual)
+    const key = this.fmtKey(task.userId, id);
+    const res = await this.kv.atomic()
+      .check({ key, versionstamp: null })
+      .set(key, actual)
       .commit();
     if (!res.ok) {
       throw new TypeError(`Task with id "${task.id}" already exists`);
@@ -28,14 +27,16 @@ export class Task {
     userId: string,
     id: string,
   ): Promise<StoredTaskSchema | null> {
-    const res = await kv.get<StoredTaskSchema>(['tasks', userId, id]);
+    const res = await this.kv.get<StoredTaskSchema>(this.fmtKey(userId, id));
     return res.value;
   }
 
   static async list(userId: string): Promise<StoredTaskSchema[]> {
     const res: StoredTaskSchema[] = [];
     for await (
-      const task of kv.list<StoredTaskSchema>({ prefix: ['tasks', userId] })
+      const task of this.kv.list<StoredTaskSchema>({
+        prefix: this.fmtKey(userId),
+      })
     ) {
       res.push(task.value);
     }
@@ -43,7 +44,8 @@ export class Task {
   }
 
   static async update(userId: string, id: string, task: TaskSchema) {
-    const old = await kv.get<StoredTaskSchema>(['tasks', userId, id]);
+    const key = this.fmtKey(userId, id);
+    const old = await this.kv.get<StoredTaskSchema>(key);
     if (!old?.value) {
       throw new Error(`Invalid task: "${id}"`);
     }
@@ -53,14 +55,17 @@ export class Task {
       name: task.name ?? old.value.name,
       isCompleted: task.isCompleted ?? old.value.isCompleted,
     };
-    await kv.atomic()
+    const res = await this.kv.atomic()
       .check(old)
-      .set(['tasks', userId, id], actual)
+      .set(key, actual)
       .commit();
+    if (!res.ok) {
+      throw new Error(`Task "${id}" not found`);
+    }
     return actual;
   }
 
   static delete(userId: string, id: string): Promise<void> {
-    return kv.delete(['tasks', userId, id]);
+    return this.kv.delete(this.fmtKey(userId, id));
   }
 }
