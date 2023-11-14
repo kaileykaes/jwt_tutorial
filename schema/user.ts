@@ -1,7 +1,20 @@
-import { ObjectId } from 'mongo';
+import { Payload } from 'djwt';
 
-export interface UserSchema {
-  _id?: ObjectId;
-  username: string;
-  password: string;
+// On the wire
+export interface State extends Payload {
+  // sub => id
+  // name
+  // nbf
+  // exp
+  roles: string[];
 }
+
+// In the KV
+export interface UserSchema {
+  id?: string; // User ID
+  name: string;
+  roles?: string[];
+  password?: string; // bcrypt w/ salt
+}
+
+export type StoredUserSchema = Required<UserSchema>;
