@@ -1,7 +1,8 @@
-import { ObjectId } from 'mongo';
-
 export interface TaskSchema {
-  _id?: ObjectId;
+  id?: string;
+  userId: string;
   name: string;
-  isCompleted: boolean;
+  isCompleted?: boolean;
 }
+
+export type StoredTaskSchema = Required<TaskSchema>;

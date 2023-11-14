@@ -1,52 +1,51 @@
-import { Handlers, HandlerContext } from "$fresh/server.ts";
-import db from '../../../database/connectBD.ts';
-import { UserSchema } from '../../../schema/user.ts';
+import { HandlerContext, Handlers } from '$fresh/server.ts';
+import type { State, UserSchema } from '../../../schema/user.ts';
 import { create } from 'djwt';
 import * as bcrypt from 'bcrypt';
 import { key } from '../../../utils/apiKey.ts';
+import { User } from '../../../database/user.ts';
 
-const users = db.collection<UserSchema>('users');
+export const handler: Handlers = {
+  async POST(req: Request, _ctx: HandlerContext) {
+    let status = 401;
+    let statusText = 'Unauthorized';
 
-export const handler:Handlers<UserSchema | null> = {
-  async POST(req: Request, _ctx: HandlerContext<UserSchema | null>) {
-    const {username, password} = await req.json();
+    const { name, password } = await req.json();
+    if (name && password) {
+      const user = await User.readByName(name);
+      if (user) {
+        if (await bcrypt.compare(password, user.password)) {
+          const now = Math.round(new Date().valueOf() / 1000);
+          const payload: State = {
+            sub: user.id,
+            name: user.name,
+            roles: user.roles,
+            nbf: now,
+            exp: now + 3600, // Good for 1h in seconds
+          };
 
-    const user = await users.findOne({ username });
+          const token = await create(
+            { alg: 'HS256', typ: 'JWT' },
+            payload,
+            key,
+          );
+          if (token) {
+            return new Response(JSON.stringify({
+              name: user.name,
+              userId: user.id,
+              token,
+            }));
+          }
 
-    if (!user) {
-      return new Response(JSON.stringify({message: `User "${username}" not found`}), {
-        status: 404,
-        statusText: 'Resource not found'
+          status = 500;
+          statusText = 'Internal server erorr';
+        }
+      }
+
+      return new Response(null, {
+        status,
+        statusText,
       });
-    };
-    const confirmPassword = await bcrypt.compare(password, user.password);
-    if (!confirmPassword) {
-      return new Response(JSON.stringify({message: 'Bad credentials'}), {
-        status: 401,
-        statusText: 'Unauthorized'
-      });
-    };
-
-    //authenticate a user
-    const payload = {
-      id: user._id,
-      name: username
-    };
-
-    const jwt = await create({ alg: 'HS512', typ: 'JWT' }, { payload }, key);
-
-    if (jwt) {
-      const body = {
-        username: user.username,
-        userId: user._id,
-        token: jwt,
-      };
-      return new Response(JSON.stringify(body));
-    } else {
-      return new Response(JSON.stringify({message: "I'm a teapot"}), {
-        status: 418,
-        statusText: "I'm a teapot"
-      });
-    };
-  }
+    }
+  },
 };

@@ -1,37 +1,42 @@
-import { Handlers } from "$fresh/server.ts";
-import db from '../../../database/connectBD.ts';
-import { UserSchema } from '../../../schema/user.ts';
+import { Handlers } from '$fresh/server.ts';
+import type { UserSchema } from '../../../schema/user.ts';
+import { User } from '../../../database/user.ts';
 import * as bcrypt from 'bcrypt';
 
-const users = db.collection<UserSchema>('users');
-
-export const handler: Handlers<User | null> = {
+export const handler: Handlers<UserSchema | null> = {
   async POST(req, _ctx) {
-    const {username, password} = (await req.json());
-    if (!username ){
-      return new Response(JSON.stringify({message: "Username missing"}), {
-        status: 400,
-        statusText: "Bad Request"
-      });
-    } else if (!password){
-      return new Response(JSON.stringify({message: "Password missing"}), {
-        status: 400,
-        statusText: 'Bad Request'
-      });
-    } else {
-      const salt = await bcrypt.genSalt(8);
-      const hashedPassword = await bcrypt.hash(password, salt);
+    let status = 400;
+    let statusText = '';
+    const { name, password } = await req.json();
 
-      const _id = await users.insertOne({
-        username,
-        password: hashedPassword,
-      });
-      const body = {
-        message: 'User created',
-        userId: _id,
-        user: username };
+    try {
+      if (!name) {
+        statusText = 'Missing name';
+      } else if (!password) {
+        statusText = 'Missing password';
+      } else {
+        const salt = await bcrypt.genSalt(8);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
-      return new Response(JSON.stringify(body));
-    };
-  }
-}
+        try {
+          const user = await User.create({
+            name: String(name),
+            password: hashedPassword,
+          });
+
+          return new Response(JSON.stringify({ id: user.id, name: user.name }));
+        } catch {
+          status = 409;
+          statusText = 'Duplicate user';
+        }
+      }
+    } catch {
+      status = 500;
+      statusText = 'Internal server error';
+    }
+    return new Response(JSON.stringify({ statusText }), {
+      status,
+      statusText,
+    });
+  },
+};

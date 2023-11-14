@@ -1,32 +1,35 @@
+import { MiddlewareHandlerContext } from '$fresh/server.ts';
 import { verify } from 'djwt';
 import { key } from '../utils/apiKey.ts';
-import { Context } from 'oak';
+import { State } from '../schema/user.ts';
 
-export const authorized = async (ctx: Context, next: any) => {
+export async function handler(
+  req: Request,
+  ctx: MiddlewareHandlerContext<State>,
+) {
+  let status = 401;
   try {
-    const headers: Headers = ctx.request.headers;
-    const authorization = headers.get('Authorization');
-    if (!authorization) {
-      ctx.response.status = 401;
-      return;
-    }
+    const authorization = req.headers.get('Authorization');
+    if (authorization) {
+      const jwt = authorization.split(' ')[1];
+      const payload = await verify(jwt, key) as State;
+      // Zero always invalid date
+      if (payload && payload.nbf && payload.exp && payload.sub) {
+        const now = new Date();
+        const nbfDate = new Date(payload.nbf * 1000);
+        const expDate = new Date(payload.exp * 1000);
 
-    const jwt = authorization.split(' ')[1];
-
-    if (!jwt) {
-      ctx.response.status = 401;
-      return;
+        // TODO(hildjj): handle clock skew
+        if ((nbfDate < now) && (expDate > now)) {
+          ctx.state = payload;
+          return ctx.next();
+        }
+      }
     }
-    const payload = await verify(jwt, key);
-
-    if (!payload) {
-      throw new Error('!payload');
-    }
-    await next();
-  } catch (_error) {
-    ctx.response.status = 401;
-    ctx.response.body = {
-      message: 'Sir, that\'ll be a nope. This route isn\'t for you.',
-    };
+  } catch (er) {
+    console.error(er);
+    status = 500;
   }
-};
+
+  return new Response('Unauthorized', { status });
+}

@@ -1,33 +1,25 @@
-import { Handlers } from "$fresh/server.ts";
-import db from '../../../database/connectBD.ts';
-import { TaskSchema } from '../../../schema/task.ts';
-import { ObjectId } from 'mongo';
+import { HandlerContext, Handlers } from '$fresh/server.ts';
+import { State } from '../../../schema/user.ts';
+import { Task } from '../../../database/task.ts';
+import type { TaskSchema } from '../../../schema/task.ts';
 
-const tasks = db.collection<TaskSchema>('tasks');
-
-export const handler: Handlers<Task | null> = {
-  async GET(_req, _ctx) {
-    const taskId = _ctx.params.taskId;
-    const task = await tasks.findOne({ _id: new ObjectId(taskId) });
-    const body = { task: {task}};
-    return new Response(JSON.stringify(body));
+export const handler: Handlers = {
+  async GET(_req, ctx: HandlerContext<State>) {
+    const task = await Task.read(ctx.state.sub, ctx.params.id);
+    if (!task) {
+      return new Response(null, { status: 404 });
+    }
+    return new Response(JSON.stringify(task));
   },
 
   async PUT(req, ctx) {
-    const taskId = ctx.params.taskId;
-    const { name, isCompleted } = await req.body().value;
-    const task = await tasks.updateOne({ _id: new ObjectId(taskId) }, {
-      $set: { name: name, isCompleted: isCompleted },
-    });
-    response.status = 200;
-    const body = { message: 'Updated task', task: task };
-    return new Response(JSON.stringify(body))
+    const task = await req.json() as TaskSchema;
+    const actual = await Task.update(ctx.state.sub, ctx.params.id, task);
+    return new Response(JSON.stringify(actual));
   },
 
   async DELETE(_req, ctx) {
-    const taskId = ctx.params.taskId;
-    const task = await tasks.deleteOne({ _id: new ObjectId(taskId) });
-    response.status = 200;
-    response.body = { message: 'Deleted task', task: task };
-  }
-}
+    await Task.delete(ctx.state.sub, ctx.params.id);
+    return new Response('{}');
+  },
+};
