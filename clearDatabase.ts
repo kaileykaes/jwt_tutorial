@@ -3,6 +3,6 @@
 
 import { Keyed } from './database/keyed.ts';
 
-for await (const {key} of Keyed.kv.list({prefix: []})) {
+for await (const { key } of Keyed.kv.list({ prefix: [] })) {
   await Keyed.kv.delete(key);
 }

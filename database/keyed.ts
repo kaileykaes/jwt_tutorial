@@ -1,8 +1,9 @@
 import { monotonicFactory } from 'ulid';
 import { kv } from './connectDB.ts';
 
-export type RetryableFunction =
-  () => Promise<Deno.KvCommitResult | Deno.KvCommitError>
+export type RetryableFunction = () => Promise<
+  Deno.KvCommitResult | Deno.KvCommitError
+>;
 
 export class Keyed {
   public static root: Deno.KvKey = [];
@@ -15,7 +16,7 @@ export class Keyed {
   }
 
   static async retry(
-    fn: RetryableFunction
+    fn: RetryableFunction,
   ): Promise<Deno.KvCommitResult | Deno.KvCommitError> {
     let last: Deno.KvCommitError | undefined = undefined;
     for (let i = 0; i < this.retries; i++) {

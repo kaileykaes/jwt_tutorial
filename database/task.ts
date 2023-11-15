@@ -46,7 +46,7 @@ export class Task extends Keyed {
   static async update(
     userId: string,
     id: string,
-    task: TaskSchema
+    task: TaskSchema,
   ): Promise<TaskSchema> {
     const key = this.fmtKey(userId, id);
 

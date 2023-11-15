@@ -20,8 +20,8 @@ export const handler: Handlers<any, State> = {
     } catch {
       return new Response(null, {
         status: 400,
-        statusText: "Bad request",
-      })
+        statusText: 'Bad request',
+      });
     }
   },
 

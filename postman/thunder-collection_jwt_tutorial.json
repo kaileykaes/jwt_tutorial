@@ -1,254 +1,254 @@
 {
-    "client": "Thunder Client",
-    "collectionName": "jwt_tutorial",
-    "dateExported": "2023-11-15T15:28:18.859Z",
-    "version": "1.1",
-    "folders": [
-        {
-            "_id": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
-            "name": "User",
-            "containerId": "",
-            "created": "2023-11-15T15:03:04.192Z",
-            "sortNum": 10000
-        },
-        {
-            "_id": "d560edaa-4c9a-4229-8b90-05a860a82c16",
-            "name": "Session",
-            "containerId": "",
-            "created": "2023-11-15T15:12:09.735Z",
-            "sortNum": 20000
-        },
-        {
-            "_id": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
-            "name": "Task",
-            "containerId": "",
-            "created": "2023-11-15T15:22:12.621Z",
-            "sortNum": 30000
-        }
-    ],
-    "requests": [
-        {
-            "_id": "c0308c0a-85bd-49ce-881d-0548fdb2848c",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
-            "name": "Create user",
-            "url": "http://localhost:{{port}}/api/users/signup",
-            "method": "POST",
-            "sortNum": 10000,
-            "created": "2023-11-15T15:05:01.690Z",
-            "modified": "2023-11-15T15:11:42.703Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
-                "form": []
-            },
-            "tests": []
-        },
-        {
-            "_id": "b63525c4-9d36-4f3e-b628-adfd97138a77",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
-            "name": "Sign in",
-            "url": "http://localhost:{{port}}/api/users/signin",
-            "method": "POST",
-            "sortNum": 20000,
-            "created": "2023-11-15T15:12:15.219Z",
-            "modified": "2023-11-15T15:15:14.636Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "set-env-var",
-                    "custom": "json.token",
-                    "action": "setto",
-                    "value": "{{token}}"
-                },
-                {
-                    "type": "set-env-var",
-                    "custom": "json.refreshToken",
-                    "action": "setto",
-                    "value": "{{refreshToken}}"
-                }
-            ]
-        },
-        {
-            "_id": "14bcf0b6-5a5e-418c-9c3d-40c5febffb3c",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
-            "name": "Refresh token",
-            "url": "http://localhost:{{port}}/api/users/refresh",
-            "method": "POST",
-            "sortNum": 30000,
-            "created": "2023-11-15T15:15:54.779Z",
-            "modified": "2023-11-15T15:17:18.671Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
-                "form": []
-            },
-            "tests": [
-                {
-                    "type": "set-env-var",
-                    "custom": "json.token",
-                    "action": "setto",
-                    "value": "{{token}}"
-                },
-                {
-                    "type": "set-env-var",
-                    "custom": "json.refreshToken",
-                    "action": "setto",
-                    "value": "{{refreshToken}}"
-                }
-            ]
-        },
-        {
-            "_id": "dd96c9c2-07f7-4645-af4e-fd9e8b617d4e",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
-            "name": "List sessions",
-            "url": "http://localhost:{{port}}/api/sessions/",
-            "method": "GET",
-            "sortNum": 40000,
-            "created": "2023-11-15T15:19:08.517Z",
-            "modified": "2023-11-15T15:19:14.662Z",
-            "headers": [],
-            "params": [],
-            "tests": []
-        },
-        {
-            "_id": "6850b757-2088-43df-9e01-973d8fd21b17",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
-            "name": "Logout",
-            "url": "http://localhost:{{port}}/api/sessions/logout",
-            "method": "POST",
-            "sortNum": 50000,
-            "created": "2023-11-15T15:19:56.046Z",
-            "modified": "2023-11-15T15:20:03.865Z",
-            "headers": [],
-            "params": [],
-            "tests": []
-        },
-        {
-            "_id": "9cc332af-6756-41f3-b672-a831cb98691c",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
-            "name": "Change password",
-            "url": "http://localhost:{{port}}/api/sessions/password",
-            "method": "PUT",
-            "sortNum": 60000,
-            "created": "2023-11-15T15:20:38.200Z",
-            "modified": "2023-11-15T15:21:37.494Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"password\": \"test\"\n}",
-                "form": []
-            },
-            "tests": []
-        },
-        {
-            "_id": "1f43be0d-045d-470a-b4b7-a53794647c0e",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
-            "name": "Create task",
-            "url": "http://localhost:{{port}}/api/tasks/",
-            "method": "POST",
-            "sortNum": 70000,
-            "created": "2023-11-15T15:22:22.115Z",
-            "modified": "2023-11-15T15:22:43.258Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"name\": \"foo3\"\n}",
-                "form": []
-            },
-            "tests": []
-        },
-        {
-            "_id": "26e5d7dd-d3f6-49c6-8e79-16240f891f51",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
-            "name": "List tasks",
-            "url": "http://localhost:{{port}}/api/tasks",
-            "method": "GET",
-            "sortNum": 80000,
-            "created": "2023-11-15T15:22:56.026Z",
-            "modified": "2023-11-15T15:24:51.588Z",
-            "headers": [],
-            "params": [],
-            "tests": [
-                {
-                    "type": "set-env-var",
-                    "custom": "json[0].id",
-                    "action": "setto",
-                    "value": "{{taskID}}"
-                }
-            ]
-        },
-        {
-            "_id": "b86bae4c-bd76-4a96-a821-71949a8b2cad",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
-            "name": "Get task",
-            "url": "http://localhost:{{port}}/api/tasks/{{taskID}}",
-            "method": "GET",
-            "sortNum": 90000,
-            "created": "2023-11-15T15:24:14.025Z",
-            "modified": "2023-11-15T15:25:07.880Z",
-            "headers": [],
-            "params": [],
-            "tests": []
-        },
-        {
-            "_id": "ea960815-95be-41f1-806f-e9fbef435e26",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
-            "name": "Delete task",
-            "url": "http://localhost:{{port}}/api/tasks/{{taskID}}",
-            "method": "DELETE",
-            "sortNum": 100000,
-            "created": "2023-11-15T15:25:36.739Z",
-            "modified": "2023-11-15T15:25:50.456Z",
-            "headers": [],
-            "params": [],
-            "tests": []
-        },
-        {
-            "_id": "7e792608-1c10-441d-aa02-9d53d953e4ec",
-            "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
-            "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
-            "name": "Update task",
-            "url": "http://localhost:{{port}}/api/tasks/{{taskID}}",
-            "method": "PUT",
-            "sortNum": 100000,
-            "created": "2023-11-15T15:26:29.446Z",
-            "modified": "2023-11-15T15:26:44.610Z",
-            "headers": [],
-            "params": [],
-            "body": {
-                "type": "json",
-                "raw": "{\n    \"isCompleted\": true\n}",
-                "form": []
-            },
-            "tests": []
-        }
-    ],
-    "settings": {
-        "auth": {
-            "type": "bearer",
-            "bearer": "{{token}}"
-        }
+  "client": "Thunder Client",
+  "collectionName": "jwt_tutorial",
+  "dateExported": "2023-11-15T15:28:18.859Z",
+  "version": "1.1",
+  "folders": [
+    {
+      "_id": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
+      "name": "User",
+      "containerId": "",
+      "created": "2023-11-15T15:03:04.192Z",
+      "sortNum": 10000
+    },
+    {
+      "_id": "d560edaa-4c9a-4229-8b90-05a860a82c16",
+      "name": "Session",
+      "containerId": "",
+      "created": "2023-11-15T15:12:09.735Z",
+      "sortNum": 20000
+    },
+    {
+      "_id": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
+      "name": "Task",
+      "containerId": "",
+      "created": "2023-11-15T15:22:12.621Z",
+      "sortNum": 30000
     }
+  ],
+  "requests": [
+    {
+      "_id": "c0308c0a-85bd-49ce-881d-0548fdb2848c",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
+      "name": "Create user",
+      "url": "http://localhost:{{port}}/api/users/signup",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2023-11-15T15:05:01.690Z",
+      "modified": "2023-11-15T15:11:42.703Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "b63525c4-9d36-4f3e-b628-adfd97138a77",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
+      "name": "Sign in",
+      "url": "http://localhost:{{port}}/api/users/signin",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2023-11-15T15:12:15.219Z",
+      "modified": "2023-11-15T15:15:14.636Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"name\": \"joe\",\n    \"password\": \"test\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "set-env-var",
+          "custom": "json.token",
+          "action": "setto",
+          "value": "{{token}}"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json.refreshToken",
+          "action": "setto",
+          "value": "{{refreshToken}}"
+        }
+      ]
+    },
+    {
+      "_id": "14bcf0b6-5a5e-418c-9c3d-40c5febffb3c",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
+      "name": "Refresh token",
+      "url": "http://localhost:{{port}}/api/users/refresh",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2023-11-15T15:15:54.779Z",
+      "modified": "2023-11-15T15:17:18.671Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+        "form": []
+      },
+      "tests": [
+        {
+          "type": "set-env-var",
+          "custom": "json.token",
+          "action": "setto",
+          "value": "{{token}}"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json.refreshToken",
+          "action": "setto",
+          "value": "{{refreshToken}}"
+        }
+      ]
+    },
+    {
+      "_id": "dd96c9c2-07f7-4645-af4e-fd9e8b617d4e",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
+      "name": "List sessions",
+      "url": "http://localhost:{{port}}/api/sessions/",
+      "method": "GET",
+      "sortNum": 40000,
+      "created": "2023-11-15T15:19:08.517Z",
+      "modified": "2023-11-15T15:19:14.662Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "6850b757-2088-43df-9e01-973d8fd21b17",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
+      "name": "Logout",
+      "url": "http://localhost:{{port}}/api/sessions/logout",
+      "method": "POST",
+      "sortNum": 50000,
+      "created": "2023-11-15T15:19:56.046Z",
+      "modified": "2023-11-15T15:20:03.865Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "9cc332af-6756-41f3-b672-a831cb98691c",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
+      "name": "Change password",
+      "url": "http://localhost:{{port}}/api/sessions/password",
+      "method": "PUT",
+      "sortNum": 60000,
+      "created": "2023-11-15T15:20:38.200Z",
+      "modified": "2023-11-15T15:21:37.494Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"password\": \"test\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "1f43be0d-045d-470a-b4b7-a53794647c0e",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
+      "name": "Create task",
+      "url": "http://localhost:{{port}}/api/tasks/",
+      "method": "POST",
+      "sortNum": 70000,
+      "created": "2023-11-15T15:22:22.115Z",
+      "modified": "2023-11-15T15:22:43.258Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"name\": \"foo3\"\n}",
+        "form": []
+      },
+      "tests": []
+    },
+    {
+      "_id": "26e5d7dd-d3f6-49c6-8e79-16240f891f51",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
+      "name": "List tasks",
+      "url": "http://localhost:{{port}}/api/tasks",
+      "method": "GET",
+      "sortNum": 80000,
+      "created": "2023-11-15T15:22:56.026Z",
+      "modified": "2023-11-15T15:24:51.588Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "set-env-var",
+          "custom": "json[0].id",
+          "action": "setto",
+          "value": "{{taskID}}"
+        }
+      ]
+    },
+    {
+      "_id": "b86bae4c-bd76-4a96-a821-71949a8b2cad",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
+      "name": "Get task",
+      "url": "http://localhost:{{port}}/api/tasks/{{taskID}}",
+      "method": "GET",
+      "sortNum": 90000,
+      "created": "2023-11-15T15:24:14.025Z",
+      "modified": "2023-11-15T15:25:07.880Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "ea960815-95be-41f1-806f-e9fbef435e26",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
+      "name": "Delete task",
+      "url": "http://localhost:{{port}}/api/tasks/{{taskID}}",
+      "method": "DELETE",
+      "sortNum": 100000,
+      "created": "2023-11-15T15:25:36.739Z",
+      "modified": "2023-11-15T15:25:50.456Z",
+      "headers": [],
+      "params": [],
+      "tests": []
+    },
+    {
+      "_id": "7e792608-1c10-441d-aa02-9d53d953e4ec",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "3933cc2c-b34b-45fd-bde5-3ba38f2e7c06",
+      "name": "Update task",
+      "url": "http://localhost:{{port}}/api/tasks/{{taskID}}",
+      "method": "PUT",
+      "sortNum": 100000,
+      "created": "2023-11-15T15:26:29.446Z",
+      "modified": "2023-11-15T15:26:44.610Z",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n    \"isCompleted\": true\n}",
+        "form": []
+      },
+      "tests": []
+    }
+  ],
+  "settings": {
+    "auth": {
+      "type": "bearer",
+      "bearer": "{{token}}"
+    }
+  }
 }
