@@ -1,0 +1,29 @@
+name: Test Deno Module
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main, migrate-to-fresh]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        deno-version: [~1.37]
+
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v2
+      - name: Use Deno Version ${{ matrix.deno-version }}
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ matrix.deno-version }}
+      - name: Build
+        run: deno task build
+      - name: Lint
+        run: deno task check
+      # - name: Test
+      #   run: deno task ci

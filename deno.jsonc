@@ -1,9 +1,11 @@
 {
   "lock": false,
   "tasks": {
-    "check": "deno fmt --check && deno lint && deno check **/*.ts",
-    "start": "deno run --watch=src/ --allow-net app.ts",
-    "update": "udd deno.jsonc"
+    "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
+    "start": "deno run --unstable -A --watch=static/,routes/ dev.ts",
+    "build": "deno run --unstable -A dev.ts build",
+    "preview": "deno run -A main.ts",
+    "update": "deno run -A -r https://fresh.deno.dev/update ."
   },
   "fmt": {
     "useTabs": false,
@@ -12,25 +14,19 @@
     "semiColons": true,
     "singleQuote": true,
     "proseWrap": "preserve",
-    "exclude": ["woords/phdef.js"]
+    "exclude": []
   },
   "lint": {
-    "exclude": ["woords/phdef.js"],
+    "exclude": [],
     "rules": {
       "tags": ["fresh", "recommended"],
-      "exclude": [
-        "no-explicit-any" // Until all `any`'s are removed
-      ],
+      "exclude": ["no-explicit-any", "no-await-in-loop"],
       "include": [
-        // All non-recommended rules should be mentioned here
         "ban-untagged-todo",
         "camelcase",
         "default-param-last",
         "eqeqeq",
-        // "explicit-function-return-type", figure out JSX first
-        // "explicit-module-boundary-types", figure out JSX first
         "guard-for-in",
-        "no-await-in-loop",
         "no-const-assign",
         "no-eval",
         "no-external-import",
@@ -39,19 +35,25 @@
         "no-sparse-arrays",
         "no-sync-fn-in-async-fn",
         "no-throw-literal"
-        // "no-top-level-await", disagree
-        // "no-undef", disagree
-        // "prefer-ascii", disagree
-        // "prefer-primordials", disagree
-        // "single-var-declarator", undocumented
-        // "triple-slash-reference", undocumented
       ]
     }
   },
   "imports": {
+    "$fresh/": "https://deno.land/x/fresh@1.5.4/",
+    "preact": "https://esm.sh/preact@10.18.1",
+    "preact/": "https://esm.sh/preact@10.18.1/",
+    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
+    "$std/": "https://deno.land/std@0.193.0/",
     "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
     "djwt": "https://deno.land/x/djwt@v2.4/mod.ts",
-    "mongo": "https://deno.land/x/mongo@v0.32.0/mod.ts",
-    "oak": "https://deno.land/x/oak@v12.6.1/mod.ts"
-  }
+    "std/": "https://deno.land/std@0.160.0/",
+    "ulid": "https://deno.land/x/ulid@v0.3.0/mod.ts"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "https://esm.sh/preact@10.15.1"
+  },
+  "exclude": ["**/_fresh/*"]
 }
