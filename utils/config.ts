@@ -14,3 +14,8 @@ export const AUTH_DURATION = 3600; // 1h
  * Length of time, in seconds, that a refresh token will be valid.
  */
 export const REFRESH_DURATION = 3600 * 24 * 7; // It's been...
+
+/**
+ * Number of bytes to salt bcyrpt with for passwords.
+ */
+export const PASSWORD_SALT_LENGTH = 8;

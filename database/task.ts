@@ -43,26 +43,35 @@ export class Task extends Keyed {
     return res;
   }
 
-  static async update(userId: string, id: string, task: TaskSchema) {
+  static async update(
+    userId: string,
+    id: string,
+    task: TaskSchema
+  ): Promise<TaskSchema> {
     const key = this.fmtKey(userId, id);
-    const old = await this.kv.get<StoredTaskSchema>(key);
-    if (!old?.value) {
-      throw new Error(`Invalid task: "${id}"`);
-    }
-    const actual = {
-      id,
-      userId,
-      name: task.name ?? old.value.name,
-      isCompleted: task.isCompleted ?? old.value.isCompleted,
-    };
-    const res = await this.kv.atomic()
-      .check(old)
-      .set(key, actual)
-      .commit();
+
+    let actual: TaskSchema | undefined = undefined;
+    const res = await this.retry(async () => {
+      const old = await this.kv.get<StoredTaskSchema>(key);
+      if (!old?.value) {
+        throw new Error(`Invalid task: "${id}"`);
+      }
+      actual = {
+        id,
+        userId,
+        name: task.name ?? old.value.name,
+        isCompleted: task.isCompleted ?? old.value.isCompleted,
+      };
+      return this.kv.atomic()
+        .check(old)
+        .set(key, actual)
+        .commit();
+    });
+
     if (!res.ok) {
       throw new Error(`Task "${id}" not found`);
     }
-    return actual;
+    return actual!;
   }
 
   static delete(userId: string, id: string): Promise<void> {
