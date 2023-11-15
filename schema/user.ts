@@ -3,9 +3,9 @@ import { Payload } from 'djwt';
 // On the wire
 export interface State extends Payload {
   // sub => id
-  // name
   // nbf
   // exp
+  name: string;
   roles: string[];
 }
 

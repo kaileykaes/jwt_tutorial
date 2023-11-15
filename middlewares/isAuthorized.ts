@@ -1,34 +1,22 @@
 import { MiddlewareHandlerContext } from '$fresh/server.ts';
-import { verify } from 'djwt';
 import { key } from '../utils/apiKey.ts';
 import { State } from '../schema/user.ts';
+import { Token } from '../controllers/token.ts';
 
 export async function handler(
   req: Request,
   ctx: MiddlewareHandlerContext<State>,
 ) {
-  let status = 401;
+  const status = 401;
   try {
     const authorization = req.headers.get('Authorization');
     if (authorization) {
       const jwt = authorization.split(' ')[1];
-      const payload = await verify(jwt, key) as State;
-      // Zero always invalid date
-      if (payload && payload.nbf && payload.exp && payload.sub) {
-        const now = new Date();
-        const nbfDate = new Date(payload.nbf * 1000);
-        const expDate = new Date(payload.exp * 1000);
-
-        // TODO(hildjj): handle clock skew
-        if ((nbfDate < now) && (expDate > now)) {
-          ctx.state = payload;
-          return ctx.next();
-        }
-      }
+      ctx.state = await new Token({ jwt }).verify(key);
+      return ctx.next();
     }
-  } catch (er) {
-    console.error(er);
-    status = 500;
+  } catch {
+    // Ignored
   }
 
   return new Response('Unauthorized', { status });

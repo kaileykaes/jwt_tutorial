@@ -1,26 +1,24 @@
 import { Handlers } from '$fresh/server.ts';
-import type { UserSchema } from '../../../schema/user.ts';
 import { User } from '../../../database/user.ts';
-import * as bcrypt from 'bcrypt';
+import { UserUtils } from '../../../controllers/user.ts';
 
-export const handler: Handlers<UserSchema | null> = {
+export const handler: Handlers = {
   async POST(req, _ctx) {
     let status = 400;
     let statusText = '';
     const { name, password } = await req.json();
 
     try {
-      if (!name) {
-        statusText = 'Missing name';
-      } else if (!password) {
-        statusText = 'Missing password';
+      if (!name || (typeof name !== 'string')) {
+        statusText = 'Invalid name';
+      } else if (!password || (typeof password !== 'string')) {
+        statusText = 'Invalid password';
       } else {
-        const salt = await bcrypt.genSalt(8);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await UserUtils.hashPassword(password);
 
         try {
           const user = await User.create({
-            name: String(name),
+            name: name,
             password: hashedPassword,
           });
 
