@@ -14,9 +14,16 @@ jobs:
       matrix:
         deno-version: [~1.37]
 
+    env:
+      DENO_DIR: deno_modules
+
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+      - uses: actions/cache@v3
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ hashFiles('deno.jsonc') }}
       - name: Use Deno Version ${{ matrix.deno-version }}
         uses: denoland/setup-deno@v1
         with:
