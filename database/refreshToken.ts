@@ -1,11 +1,12 @@
+import { Invalid } from '../controllers/invalid.ts';
+import { Keyed } from './keyed.ts';
 import { REFRESH_DURATION } from '../utils/config.ts';
 import { RefreshTokenSchema } from '../schema/refreshToken.ts';
-import { Keyed } from './keyed.ts';
 
 export class RefreshToken extends Keyed {
   public static root: Deno.KvKey = ['refresh'];
 
-  static async create(state: RefreshTokenSchema) {
+  static async create(state: RefreshTokenSchema): Promise<RefreshTokenSchema> {
     const key = this.fmtKey(state.sub!, state.jti!);
     const res = await this.kv.atomic()
       .check({ key, versionstamp: null })
@@ -48,8 +49,14 @@ export class RefreshToken extends Keyed {
   static async logout(userId: string): Promise<number> {
     let txn = this.kv.atomic();
     let count = 0;
-    for await (const tok of this.kv.list({ prefix: ['refresh', userId] })) {
+    for await (
+      const tok of this.kv.list<RefreshTokenSchema>({
+        prefix: ['refresh', userId],
+      })
+    ) {
       txn = txn.delete(tok.key);
+      // This is a layer violation, but it's convenient.
+      Invalid.instance.invalidate(tok.value);
       count++;
     }
     const res = await txn.commit();

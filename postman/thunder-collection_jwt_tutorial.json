@@ -1,7 +1,7 @@
 {
   "client": "Thunder Client",
   "collectionName": "jwt_tutorial",
-  "dateExported": "2023-11-15T15:28:18.859Z",
+  "dateExported": "2023-11-16T16:12:01.700Z",
   "version": "1.1",
   "folders": [
     {
@@ -32,11 +32,11 @@
       "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
       "containerId": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
       "name": "Create user",
-      "url": "http://localhost:{{port}}/api/users/signup",
+      "url": "http://localhost:{{port}}/api/users",
       "method": "POST",
       "sortNum": 10000,
       "created": "2023-11-15T15:05:01.690Z",
-      "modified": "2023-11-15T15:11:42.703Z",
+      "modified": "2023-11-16T16:06:12.965Z",
       "headers": [],
       "params": [],
       "body": {
@@ -51,11 +51,11 @@
       "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
       "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
       "name": "Sign in",
-      "url": "http://localhost:{{port}}/api/users/signin",
+      "url": "http://localhost:{{port}}/api/sessions",
       "method": "POST",
       "sortNum": 20000,
       "created": "2023-11-15T15:12:15.219Z",
-      "modified": "2023-11-15T15:15:14.636Z",
+      "modified": "2023-11-16T16:11:50.315Z",
       "headers": [],
       "params": [],
       "body": {
@@ -75,6 +75,12 @@
           "custom": "json.refreshToken",
           "action": "setto",
           "value": "{{refreshToken}}"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json.userId",
+          "action": "setto",
+          "value": "{{userId}}"
         }
       ]
     },
@@ -83,11 +89,11 @@
       "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
       "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
       "name": "Refresh token",
-      "url": "http://localhost:{{port}}/api/users/refresh",
-      "method": "POST",
+      "url": "http://localhost:{{port}}/api/sessions",
+      "method": "PUT",
       "sortNum": 30000,
       "created": "2023-11-15T15:15:54.779Z",
-      "modified": "2023-11-15T15:17:18.671Z",
+      "modified": "2023-11-16T16:11:37.660Z",
       "headers": [],
       "params": [],
       "body": {
@@ -107,6 +113,12 @@
           "custom": "json.refreshToken",
           "action": "setto",
           "value": "{{refreshToken}}"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json.userId",
+          "action": "setto",
+          "value": "{{userId}}"
         }
       ]
     },
@@ -115,11 +127,11 @@
       "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
       "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
       "name": "List sessions",
-      "url": "http://localhost:{{port}}/api/sessions/",
+      "url": "http://localhost:{{port}}/api/sessions",
       "method": "GET",
       "sortNum": 40000,
       "created": "2023-11-15T15:19:08.517Z",
-      "modified": "2023-11-15T15:19:14.662Z",
+      "modified": "2023-11-16T16:07:03.139Z",
       "headers": [],
       "params": [],
       "tests": []
@@ -129,11 +141,11 @@
       "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
       "containerId": "d560edaa-4c9a-4229-8b90-05a860a82c16",
       "name": "Logout",
-      "url": "http://localhost:{{port}}/api/sessions/logout",
-      "method": "POST",
+      "url": "http://localhost:{{port}}/api/sessions",
+      "method": "DELETE",
       "sortNum": 50000,
       "created": "2023-11-15T15:19:56.046Z",
-      "modified": "2023-11-15T15:20:03.865Z",
+      "modified": "2023-11-16T16:07:50.504Z",
       "headers": [],
       "params": [],
       "tests": []
@@ -242,6 +254,20 @@
         "raw": "{\n    \"isCompleted\": true\n}",
         "form": []
       },
+      "tests": []
+    },
+    {
+      "_id": "ab252d47-320d-4244-bfe9-5ceef583ef22",
+      "colId": "c5a98378-4549-4b3e-8d6a-7181c1850a23",
+      "containerId": "047c4d66-c0f9-455a-b36d-4b3ce73d92a4",
+      "name": "Delete user",
+      "url": "http://localhost:{{port}}/api/users/{{userId}}",
+      "method": "DELETE",
+      "sortNum": 110000,
+      "created": "2023-11-16T16:10:10.957Z",
+      "modified": "2023-11-16T16:10:30.204Z",
+      "headers": [],
+      "params": [],
       "tests": []
     }
   ],
