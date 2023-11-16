@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, migrate-to-fresh]
+    branches: [main]
 
 jobs:
   test:
@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Git Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Use Deno Version ${{ matrix.deno-version }}
         uses: denoland/setup-deno@v1
         with:
@@ -25,5 +25,5 @@ jobs:
         run: deno task build
       - name: Lint
         run: deno task check
-      # - name: Test
-      #   run: deno task ci
+      - name: Test
+        run: deno task ci

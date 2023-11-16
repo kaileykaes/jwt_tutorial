@@ -24,7 +24,7 @@ export class RefreshToken extends Keyed {
     next: RefreshTokenSchema,
   ): Promise<RefreshTokenSchema> {
     const oldKey = this.fmtKey(previous.sub!, previous.jti!);
-    const old = await this.kv.get(oldKey);
+    const old = await this.kv.get<RefreshTokenSchema>(oldKey);
     if (!old?.value) {
       // Already used
       throw new Error(`Invalid refresh token`);
@@ -42,6 +42,9 @@ export class RefreshToken extends Keyed {
       // This one should be difficult to make happen
       throw new Error('Invalid refresh token');
     }
+
+    // This is a layer violation, but it's convenient.
+    Invalid.instance.invalidate(old.value);
 
     return token;
   }

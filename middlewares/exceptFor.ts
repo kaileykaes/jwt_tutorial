@@ -1,6 +1,9 @@
-import { MiddlewareHandler, MiddlewareHandlerContext } from '$fresh/server.ts';
 import { KnownMethod } from '$fresh/src/server/router.ts';
+import { MiddlewareHandler, MiddlewareHandlerContext } from '$fresh/server.ts';
 
+/**
+ * Pathname -> list of HTTP methods that apply
+ */
 type ExceptConfig = Record<string, KnownMethod[]>;
 
 export function exceptFor<T>(

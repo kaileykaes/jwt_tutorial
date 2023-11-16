@@ -6,10 +6,11 @@ export type RetryableFunction = () => Promise<
 >;
 
 export class Keyed {
+  // Abstract.  Overwrite in child classes
   public static root: Deno.KvKey = [];
-  public static id = monotonicFactory();
-  public static kv = kv;
   public static retries = 5;
+  public static readonly id = monotonicFactory();
+  public static readonly kv = kv;
 
   static fmtKey(...extra: Deno.KvKeyPart[]) {
     return [...this.root, ...extra];
@@ -26,6 +27,7 @@ export class Keyed {
       }
       last = res;
     }
+    // retries > 0
     return last!;
   }
 }
