@@ -59,4 +59,32 @@ export class User extends Keyed {
       throw new Error(`Error saving user "${state.id}"`);
     }
   }
+
+  static async delete(id: string): Promise<void> {
+    const idKey = this.fmtKey(id);
+
+    const res = await this.retry(async () => {
+      const idRes = await this.kv.get<StoredUserSchema>(idKey);
+      if (!idRes?.value) {
+        throw new Error(`Invalid user "${id}"`);
+      }
+      const nameKey = this.fmtKey('name', idRes.value.name);
+      const nameRes = await this.kv.get<StoredUserSchema>(nameKey);
+
+      if (!nameRes?.value) {
+        throw new Error(`Invalid user "${id}"`);
+      }
+
+      return this.kv.atomic()
+        .check(idRes)
+        .check(nameRes)
+        .delete(idKey)
+        .delete(nameKey)
+        .commit();
+    });
+
+    if (!res.ok) {
+      throw new Error(`Error saving user "${id}"`);
+    }
+  }
 }

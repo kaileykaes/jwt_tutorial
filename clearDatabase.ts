@@ -3,6 +3,9 @@
 
 import { Keyed } from './database/keyed.ts';
 
+let count = 0;
 for await (const { key } of Keyed.kv.list({ prefix: [] })) {
   await Keyed.kv.delete(key);
+  count++;
 }
+console.log(`Deleted ${count} records`);

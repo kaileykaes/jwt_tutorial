@@ -16,7 +16,7 @@ export async function handler(
       return ctx.next();
     }
   } catch {
-    // Ignored
+    // All errors return 401 to hide information from attackers
   }
 
   return new Response('Unauthorized', { status });

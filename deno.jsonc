@@ -5,7 +5,9 @@
     "start": "deno run --unstable -A --watch=static/,routes/ dev.ts",
     "build": "deno run --unstable -A dev.ts build",
     "preview": "deno run -A main.ts",
-    "update": "deno run -A -r https://fresh.deno.dev/update ."
+    "test": "rm -rf coverage && deno test -A --unstable --coverage=coverage && deno coverage coverage --lcov --output=coverage/lcov.info && genhtml -o coverage/html --ignore-errors unmapped coverage/lcov.info",
+    "ci": "deno test --unstable -A --coverage=coverage && deno coverage coverage --lcov --output=coverage/lcov.info",
+    "update": "deno run -A -r https://fresh.deno.dev/update . && deno run -A https://deno.land/x/udd/main.ts deno.jsonc --dry-run"
   },
   "fmt": {
     "useTabs": false,
@@ -14,10 +16,10 @@
     "semiColons": true,
     "singleQuote": true,
     "proseWrap": "preserve",
-    "exclude": []
+    "exclude": ["deno_modules"]
   },
   "lint": {
-    "exclude": [],
+    "exclude": ["deno_modules"],
     "rules": {
       "tags": ["fresh", "recommended"],
       "exclude": ["no-explicit-any", "no-await-in-loop"],
@@ -39,21 +41,20 @@
     }
   },
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.5.4/",
-    "preact": "https://esm.sh/preact@10.18.1",
-    "preact/": "https://esm.sh/preact@10.18.1/",
-    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.2",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
-    "$std/": "https://deno.land/std@0.193.0/",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
+    "$fresh/": "https://deno.land/x/fresh@1.5.4/",
+    "$std/": "https://deno.land/std@0.206.0/",
     "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
     "djwt": "https://deno.land/x/djwt@v2.4/mod.ts",
-    "std/": "https://deno.land/std@0.160.0/",
+    "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.3.1",
+    "preact": "https://esm.sh/preact@10.18.1",
+    "preact/": "https://esm.sh/preact@10.18.1/",
     "ulid": "https://deno.land/x/ulid@v0.3.0/mod.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "https://esm.sh/preact@10.15.1"
+    "jsxImportSource": "https://esm.sh/preact@11.0.0-experimental.1/"
   },
   "exclude": ["**/_fresh/*"]
 }

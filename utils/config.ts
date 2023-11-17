@@ -19,3 +19,8 @@ export const REFRESH_DURATION = 3600 * 24 * 7; // It's been...
  * Number of bytes to salt bcyrpt with for passwords.
  */
 export const PASSWORD_SALT_LENGTH = 8;
+
+/**
+ * How often to clean up invalid auth tokens.
+ */
+export const LOGOUT_EXPIRY = 5 * 60 * 1000; // 5m

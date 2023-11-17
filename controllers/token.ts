@@ -1,5 +1,6 @@
 import { create as jwtCreate, type Header, verify as jwtVerify } from 'djwt';
 import { State } from '../schema/user.ts';
+import { Invalid } from './invalid.ts';
 
 export interface JwtTokenSpecfier {
   jwt: string;
@@ -53,7 +54,14 @@ export class Token {
     this.#payload = payload;
 
     // Zero always invalid date
-    if (payload && payload.nbf && payload.exp && payload.sub) {
+    if (
+      payload &&
+      payload.nbf &&
+      payload.exp &&
+      payload.sub &&
+      Invalid.instance.isValid(payload)
+    ) {
+      // TODO(hildjj): djwt might already do these checks?
       const now = new Date().getTime();
       const nbfDate = payload.nbf * 1000;
       const expDate = payload.exp * 1000;
