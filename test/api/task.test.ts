@@ -13,7 +13,6 @@ const CONN_INFO: ServeHandlerInfo = {
 await Deno.test('Tasks', async (t) => {
   const handler = await createHandler(manifest, config);
   const name = crypto.randomUUID()
-  console.log(name)
 
   let resp: Response | undefined = undefined;
 
@@ -28,6 +27,7 @@ await Deno.test('Tasks', async (t) => {
     }),
     CONN_INFO,
   );
+
 //starts session for created user
   resp = await handler(
       new Request(`${root}/api/sessions`, {
@@ -39,8 +39,9 @@ await Deno.test('Tasks', async (t) => {
       }),
       CONN_INFO,
     );
+
 //authorization
-  const token = await resp!.json();
+  let { UserId, token} = await resp!.json();
   const headers = {
     'Authorization': `bearer ${token}`,
   };
@@ -63,7 +64,7 @@ await Deno.test('Tasks', async (t) => {
       }),
       CONN_INFO
     );
-    assertEquals(resp.status, 500)
+    assertEquals(resp.status, 500);
 
     resp = await handler(
       new Request(`${root}/api/tasks`, {
