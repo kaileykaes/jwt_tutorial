@@ -16,7 +16,6 @@ await Deno.test('Tasks', async (t) => {
 
   let resp: Response | undefined = undefined;
 
-//creates user
   await handler(
     new Request(`${root}/api/users`, {
       method: 'POST',
@@ -28,7 +27,6 @@ await Deno.test('Tasks', async (t) => {
     CONN_INFO,
   );
 
-//starts session for created user
   resp = await handler(
       new Request(`${root}/api/sessions`, {
         method: 'POST',
@@ -40,7 +38,6 @@ await Deno.test('Tasks', async (t) => {
       CONN_INFO,
     );
 
-//authorization
   let { UserId, token} = await resp!.json();
   const headers = {
     'Authorization': `bearer ${token}`,
@@ -134,7 +131,7 @@ await Deno.test('Tasks', async (t) => {
         method: 'PUT',
         body: JSON.stringify({
           isCompleted: true,
-        })
+        }),
       }),
       CONN_INFO,
     );
@@ -175,7 +172,7 @@ await Deno.test('Tasks', async (t) => {
     resp = await handler(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'DELETE',
-        headers
+        headers,
       }),
       CONN_INFO,
     );
