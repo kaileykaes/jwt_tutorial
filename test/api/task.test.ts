@@ -28,17 +28,17 @@ await Deno.test('Tasks', async (t) => {
   );
 
   resp = await handler(
-      new Request(`${root}/api/sessions`, {
-        method: 'POST',
-        body: JSON.stringify({
-          name,
-          password: 'test',
-        }),
+    new Request(`${root}/api/sessions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        password: 'test',
       }),
-      CONN_INFO,
-    );
+    }),
+    CONN_INFO,
+  );
 
-  let { UserId, token} = await resp!.json();
+  let { UserId, token } = await resp!.json();
   const headers = {
     'Authorization': `bearer ${token}`,
   };
@@ -99,7 +99,7 @@ await Deno.test('Tasks', async (t) => {
 
   await t.step('single task', async () => {
     resp = await handler(
-      new Request(`${root}/api/tasks/${task.id}`,{
+      new Request(`${root}/api/tasks/${task.id}`, {
         method: 'GET',
       }),
       CONN_INFO,
@@ -107,7 +107,7 @@ await Deno.test('Tasks', async (t) => {
     assertEquals(resp.status, 401);
 
     resp = await handler(
-      new Request(`${root}/api/tasks/${crypto.randomUUID()}`,{
+      new Request(`${root}/api/tasks/${crypto.randomUUID()}`, {
         method: 'GET',
         headers,
       }),
