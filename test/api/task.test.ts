@@ -38,7 +38,7 @@ await Deno.test('Tasks', async (t) => {
     CONN_INFO,
   );
 
-  let { UserId, token } = await resp!.json();
+  const { _UserId, token } = await resp!.json();
   const headers = {
     'Authorization': `bearer ${token}`,
   };
