@@ -12,7 +12,7 @@ const CONN_INFO: ServeHandlerInfo = {
 
 await Deno.test('Tasks', async (t) => {
   const handler = await createHandler(manifest, config);
-  const name = crypto.randomUUID()
+  const name = crypto.randomUUID();
 
   let resp: Response | undefined = undefined;
 
@@ -22,7 +22,7 @@ await Deno.test('Tasks', async (t) => {
       method: 'POST',
       body: JSON.stringify({
         name,
-        password: 'test'
+        password: 'test',
       }),
     }),
     CONN_INFO,
@@ -34,7 +34,7 @@ await Deno.test('Tasks', async (t) => {
         method: 'POST',
         body: JSON.stringify({
           name,
-          password: 'test'
+          password: 'test',
         }),
       }),
       CONN_INFO,
@@ -62,7 +62,7 @@ await Deno.test('Tasks', async (t) => {
         body: '',
         headers,
       }),
-      CONN_INFO
+      CONN_INFO,
     );
     assertEquals(resp.status, 500);
 
@@ -93,11 +93,11 @@ await Deno.test('Tasks', async (t) => {
     resp = await handler(
       new Request(`${root}/api/tasks`, {
         method: 'GET',
-        headers
+        headers,
       }),
       CONN_INFO,
     );
-    assertEquals(resp.status, 200)
+    assertEquals(resp.status, 200);
   });
 
   await t.step('single task', async () => {
@@ -125,7 +125,7 @@ await Deno.test('Tasks', async (t) => {
       }),
       CONN_INFO,
     );
-    assertEquals(resp.status, 200)
+    assertEquals(resp.status, 200);
   });
 
   await t.step('update', async () => {
@@ -133,12 +133,12 @@ await Deno.test('Tasks', async (t) => {
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'PUT',
         body: JSON.stringify({
-          isCompleted: true
+          isCompleted: true,
         })
       }),
       CONN_INFO,
     );
-    assertEquals(resp.status, 401)
+    assertEquals(resp.status, 401);
 
     resp = await handler(
       new Request(`${root}/api/tasks/${task.id}`, {
@@ -154,7 +154,7 @@ await Deno.test('Tasks', async (t) => {
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'PUT',
         body: JSON.stringify({
-          isCompleted: true
+          isCompleted: true,
         }),
         headers,
       }),
