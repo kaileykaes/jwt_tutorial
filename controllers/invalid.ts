@@ -1,5 +1,25 @@
-import { State } from '../schema/user.ts';
-import { LOGOUT_EXPIRY } from '../utils/config.ts';
+import { assertEquals } from '$std/assert/assert_equals.ts';
+import { decodeTime } from 'ulid';
+import { AUTH_DURATION, LOGOUT_EXPIRY } from '../utils/config.ts';
+import { Heap } from 'heap-js';
+
+interface HeapEntry {
+  id: string;
+  expires: number;
+}
+
+export interface InvalidConfig {
+  /**
+   * How often to eject unneeded entries from the list, in ms.
+   * @default LOGOUT_EXPIRY
+   */
+  timeout?: number;
+  /**
+   * How long items should persist in the list, in ms.
+   * @default AUTH_DURATION * 1000
+   */
+  duration?: number;
+}
 
 /**
  * A list of invalid JWT tokens by jti.  When logging out, put tokens in this
@@ -20,59 +40,112 @@ import { LOGOUT_EXPIRY } from '../utils/config.ts';
  */
 export class Invalid {
   // Global instance
-  static instance = new Invalid(LOGOUT_EXPIRY);
+  static instance = new Invalid().start();
 
-  #expiry: number;
-  #map = new Map<string, number>();
+  #timeout: number;
+  #duration: number;
+  #set = new Set<string>();
+  #heap = new Heap<HeapEntry>(Invalid.#compareEntries);
   #timer = 0;
 
-  constructor(expiry: number) {
-    this.#expiry = expiry;
-    this.start();
+  constructor(config?: InvalidConfig) {
+    this.#timeout = config?.timeout ?? LOGOUT_EXPIRY;
+    this.#duration = config?.duration ?? AUTH_DURATION * 1000;
   }
 
-  start(): void {
+  static #compareEntries(a: HeapEntry, b: HeapEntry): number {
+    return a.expires - b.expires;
+  }
+
+  /**
+   * Begin the expiry tick.  Fires every duration ms, looking for entries
+   * to eject.
+   *
+   * @returns this
+   */
+  start(): Invalid {
     this.stop();
-    this.#timer = setInterval(() => this.expire(), this.#expiry);
+    this.#timer = setInterval(() => this.expire(), this.#timeout);
+    // Don't block shutdown with timer.
+    Deno.unrefTimer(this.#timer);
+    return this;
   }
 
-  stop(): void {
+  /**
+   * Stops the expiry tick.
+   *
+   * @returns this
+   */
+  stop(): Invalid {
     clearInterval(this.#timer);
     this.#timer = 0;
+    return this;
   }
 
-  // Mostly for testing, I think.
-  [Symbol.dispose](): void {
-    this.stop();
-    // The map should deallocate right after this, no need to clear it.
+  /**
+   * Is the given token id not known to be invalid?
+   *
+   * @param id The jti for a token pair
+   * @returns
+   */
+  isValid(id: string): boolean {
+    return !this.#set.has(id);
   }
 
-  isValid(state: State): boolean {
-    if (!state.jti) {
-      return false;
+  /**
+   * Mark the given token as invalid for a while.
+   *
+   * @param id The jti for a token pair.  MUST be a valid ULID.
+   * @returns
+   */
+  invalidate(id: string): number {
+    // Ignore expiry, since it will often be for the refresh token. We will
+    // extract the time from the id, and add the AUTH_DURATION. That should
+    // keep the item in the heap for at most AUTH_DURATION + CLOCK_SKEW
+    // seconds.
+
+    const entry: HeapEntry = {
+      id,
+      expires: decodeTime(id) + this.#duration,
+    };
+    if (entry.expires > new Date().getTime()) {
+      this.#heap.push(entry);
+      this.#set.add(id);
+      return entry.expires;
     }
-    return !this.#map.has(state.jti);
+    return -Infinity;
   }
 
-  invalidate(state: State): void {
-    if (!state.jti || !state.exp) {
-      throw new Error('Invalid token state');
-    }
-    const now = new Date().getTime();
-    if (now < state.exp * 1000) {
-      this.#map.set(state.jti, state.exp);
-    }
-  }
-
+  /**
+   * Check the list of entries to see which tokens have expired, so are no safe
+   * to not track any more.  Works from the onese shose expiry time is the
+   * closest to now, towards less-likely-to-expire tokens.
+   *
+   * Runs in a timer loop if start() is called.  The global instance has had
+   * start() called on it.
+   *
+   * @returns The number of tokens evicted from the list.
+   */
   expire(): number {
-    const now = Math.floor(new Date().getTime() / 1000);
+    const now = new Date().getTime();
     let count = 0;
-    for (const [k, v] of this.#map.entries()) {
-      if (v > now) {
-        this.#map.delete(k);
+    let entry: HeapEntry | undefined = undefined;
+
+    // Pull entries off the Heap until we find one that hasn't expired.
+    while ((entry = this.#heap.peek())) {
+      if (entry.expires < now) {
+        this.#set.delete(entry.id);
+        this.#heap.pop();
         count++;
+      } else {
+        break;
       }
     }
     return count;
+  }
+
+  size(): number {
+    assertEquals(this.#heap.length, this.#set.size);
+    return this.#set.size;
   }
 }

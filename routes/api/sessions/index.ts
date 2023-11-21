@@ -1,11 +1,11 @@
 import { Handlers } from '$fresh/server.ts';
 import { RefreshToken } from '../../../database/refreshToken.ts';
 import { State } from '../../../schema/user.ts';
-import * as bcrypt from 'bcrypt';
 import { key, refreshKey } from '../../../utils/apiKey.ts';
 import { RefreshTokenSchema } from '../../../schema/refreshToken.ts';
 import { Token } from '../../../controllers/token.ts';
 import { User } from '../../../database/user.ts';
+import { UserUtils } from '../../../controllers/user.ts';
 import {
   AUTH_DURATION,
   CLOCK_SKEW,
@@ -28,7 +28,7 @@ export const handler: Handlers<Response, State> = {
       if (name && password) {
         const user = await User.readByName(name);
         if (user) {
-          if (await bcrypt.compare(password, user.password)) {
+          if (await UserUtils.isPasswordValid(password, user.password)) {
             const now = Math.round(new Date().valueOf() / 1000) - CLOCK_SKEW;
             const payload: State = {
               jti: RefreshToken.id(), // For both tokens in the pair

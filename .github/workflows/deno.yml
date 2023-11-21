@@ -12,25 +12,32 @@ jobs:
 
     strategy:
       matrix:
-        deno-version: [~1.37]
-
-    env:
-      DENO_DIR: deno_modules
+        deno-version: [~1.38]
 
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
       - uses: actions/cache@v3
+        env:
+          DENO_DIR: ${{ runner.temp }}/deno_modules
         with:
           path: ${{ env.DENO_DIR }}
           key: ${{ hashFiles('deno.jsonc') }}
       - name: Use Deno Version ${{ matrix.deno-version }}
         uses: denoland/setup-deno@v1
+        env:
+          DENO_DIR: ${{ runner.temp }}/deno_modules
         with:
           deno-version: ${{ matrix.deno-version }}
       - name: Build
+        env:
+          DENO_DIR: ${{ runner.temp }}/deno_modules
         run: deno task build
       - name: Lint
+        env:
+          DENO_DIR: ${{ runner.temp }}/deno_modules
         run: deno task check
       - name: Test
+        env:
+          DENO_DIR: ${{ runner.temp }}/deno_modules
         run: deno task ci
