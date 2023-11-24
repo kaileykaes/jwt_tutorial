@@ -2,7 +2,6 @@ import { assertEquals } from '$std/assert/mod.ts';
 import { userId, token, CONN_INFO, HANDLER } from '../config.ts';
 import { failCommit } from '../database/dbUtils.ts';
 import { User } from '../../database/user.ts';
-import { Task } from '../../database/task.ts';
 
 
 const hostname = '127.0.0.1';
@@ -178,5 +177,5 @@ await Deno.test('Tasks', async (t) => {
     assertEquals(resp.status, 200);
     assertEquals(await resp.json(), {})
   });
-  await User.kv.delete(User.fmtKey(userId)); // this doesn't actually work
+  await User.kv.delete(User.fmtKey()); // this doesn't actually work
 });
