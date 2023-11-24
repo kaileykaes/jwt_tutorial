@@ -11,7 +11,7 @@ export const handler: Handlers<TaskSchema, State> = {
 
   async POST(req, ctx) {
     let status = 400;
-    let statusText = 'Bad request'
+    let statusText = 'Bad request';
     try {
       const task = await req.json() as TaskSchema;
       try {

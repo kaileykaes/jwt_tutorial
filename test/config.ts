@@ -1,10 +1,10 @@
 import { createHandler, type ServeHandlerInfo } from '$fresh/server.ts';
-import manifest from '../fresh.gen.ts'
+import manifest from '../fresh.gen.ts';
 import config from '../fresh.config.ts';
 
 const hostname = '127.0.0.1';
 const root = `http://${hostname}`;
-const name = 'hildjjlovespie' // I mean it could be '_____TESTING_____', but...
+const name = 'hildjjlovespie'; // I mean it could be '_____TESTING_____', but...
 
 export const CONN_INFO: ServeHandlerInfo = {
   remoteAddr: { hostname, port: 53496, transport: 'tcp' },

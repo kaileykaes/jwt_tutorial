@@ -1,8 +1,7 @@
 import { assertEquals } from '$std/assert/mod.ts';
-import { userId, token, CONN_INFO, HANDLER } from '../config.ts';
+import { CONN_INFO, HANDLER, token, userId } from '../config.ts';
 import { failCommit } from '../database/dbUtils.ts';
 import { User } from '../../database/user.ts';
-
 
 const hostname = '127.0.0.1';
 const root = `http://${hostname}`;
@@ -113,7 +112,7 @@ await Deno.test('Tasks', async (t) => {
       id: task.id,
       userId: userId,
       name: task.name,
-      isCompleted: task.isCompleted
+      isCompleted: task.isCompleted,
     });
   });
 
@@ -154,7 +153,7 @@ await Deno.test('Tasks', async (t) => {
       id: task.id,
       userId: userId,
       name: task.name,
-      isCompleted: true
+      isCompleted: true,
     });
   });
 
@@ -175,7 +174,7 @@ await Deno.test('Tasks', async (t) => {
       CONN_INFO,
     );
     assertEquals(resp.status, 200);
-    assertEquals(await resp.json(), {})
+    assertEquals(await resp.json(), {});
   });
   await User.kv.delete(User.fmtKey(userId)); // this doesn't actually work
 });
