@@ -10,19 +10,24 @@ export const handler: Handlers<TaskSchema, State> = {
   },
 
   async POST(req, ctx) {
-    const task = await req.json() as TaskSchema;
+    let status = 400;
+    let statusText = 'Bad request'
     try {
-      const actual = await Task.create({
-        ...task,
-        id: undefined,
-        userId: ctx.state.sub!,
-      });
-      return new Response(JSON.stringify(actual));
+      const task = await req.json() as TaskSchema;
+      try {
+        const actual = await Task.create({
+          ...task,
+          id: undefined,
+          userId: ctx.state.sub!,
+        });
+        return new Response(JSON.stringify(actual));
+      } catch {
+        status = 500;
+        statusText = 'Internal Server Error';
+      }
     } catch {
-      return new Response(null, {
-        status: 500,
-        statusText: 'Internal Server Error',
-      });
+      // 400
     }
+    return new Response(null, { status, statusText });
   },
 };
