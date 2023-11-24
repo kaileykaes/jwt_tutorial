@@ -177,5 +177,5 @@ await Deno.test('Tasks', async (t) => {
     assertEquals(resp.status, 200);
     assertEquals(await resp.json(), {})
   });
-  await User.kv.delete(User.fmtKey()); // this doesn't actually work
+  await User.kv.delete(User.fmtKey(userId)); // this doesn't actually work
 });
