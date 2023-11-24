@@ -1,50 +1,22 @@
-import { createHandler, type ServeHandlerInfo } from '$fresh/server.ts';
-import manifest from '../../fresh.gen.ts';
-import config from '../../fresh.config.ts';
 import { assertEquals } from '$std/assert/mod.ts';
+import { userId, token, CONN_INFO, HANDLER } from '../config.ts';
+import { failCommit } from '../database/dbUtils.ts';
+import { User } from '../../database/user.ts';
+import { Task } from '../../database/task.ts';
+
 
 const hostname = '127.0.0.1';
 const root = `http://${hostname}`;
 
-const CONN_INFO: ServeHandlerInfo = {
-  remoteAddr: { hostname, port: 53496, transport: 'tcp' },
-};
-
 await Deno.test('Tasks', async (t) => {
-  const handler = await createHandler(manifest, config);
-  const name = crypto.randomUUID();
-
   let resp: Response | undefined = undefined;
 
-  await handler(
-    new Request(`${root}/api/users`, {
-      method: 'POST',
-      body: JSON.stringify({
-        name,
-        password: 'test',
-      }),
-    }),
-    CONN_INFO,
-  );
-
-  resp = await handler(
-    new Request(`${root}/api/sessions`, {
-      method: 'POST',
-      body: JSON.stringify({
-        name,
-        password: 'test',
-      }),
-    }),
-    CONN_INFO,
-  );
-
-  const { _UserId, token } = await resp!.json();
   const headers = {
     'Authorization': `bearer ${token}`,
   };
 
   await t.step('create', async () => {
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks`, {
         method: 'POST',
         body: '',
@@ -53,7 +25,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 401);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks`, {
         method: 'POST',
         body: '',
@@ -61,9 +33,9 @@ await Deno.test('Tasks', async (t) => {
       }),
       CONN_INFO,
     );
-    assertEquals(resp.status, 500);
+    assertEquals(resp.status, 400);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks`, {
         method: 'POST',
         headers,
@@ -79,7 +51,7 @@ await Deno.test('Tasks', async (t) => {
   const task = await resp!.json();
 
   await t.step('get tasks', async () => {
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks`, {
         method: 'GET',
       }),
@@ -87,7 +59,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 401);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks`, {
         method: 'GET',
         headers,
@@ -95,10 +67,25 @@ await Deno.test('Tasks', async (t) => {
       CONN_INFO,
     );
     assertEquals(resp.status, 200);
+
+    await failCommit(async () => {
+      resp = await HANDLER(
+        new Request(`${root}/api/tasks`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            name: 'Wash the cats',
+          }),
+        }),
+        CONN_INFO,
+      );
+      assertEquals(resp.status, 500);
+      return new Error('Error to make type checking happy');
+    });
   });
 
   await t.step('single task', async () => {
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'GET',
       }),
@@ -106,7 +93,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 401);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${crypto.randomUUID()}`, {
         method: 'GET',
         headers,
@@ -115,7 +102,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 404);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'GET',
         headers,
@@ -123,10 +110,16 @@ await Deno.test('Tasks', async (t) => {
       CONN_INFO,
     );
     assertEquals(resp.status, 200);
+    assertEquals(await resp.json(), {
+      id: task.id,
+      userId: userId,
+      name: task.name,
+      isCompleted: task.isCompleted
+    });
   });
 
   await t.step('update', async () => {
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -137,7 +130,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 401);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'PUT',
         body: '',
@@ -147,7 +140,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 400);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'PUT',
         body: JSON.stringify({
@@ -158,10 +151,16 @@ await Deno.test('Tasks', async (t) => {
       CONN_INFO,
     );
     assertEquals(resp.status, 200);
+    assertEquals(await resp.json(), {
+      id: task.id,
+      userId: userId,
+      name: task.name,
+      isCompleted: true
+    });
   });
 
   await t.step('delete', async () => {
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'DELETE',
       }),
@@ -169,7 +168,7 @@ await Deno.test('Tasks', async (t) => {
     );
     assertEquals(resp.status, 401);
 
-    resp = await handler(
+    resp = await HANDLER(
       new Request(`${root}/api/tasks/${task.id}`, {
         method: 'DELETE',
         headers,
@@ -177,5 +176,7 @@ await Deno.test('Tasks', async (t) => {
       CONN_INFO,
     );
     assertEquals(resp.status, 200);
+    assertEquals(await resp.json(), {})
   });
+  await User.kv.delete(User.fmtKey(userId)); // this doesn't actually work
 });
