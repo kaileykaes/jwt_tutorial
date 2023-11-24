@@ -43,7 +43,7 @@ export class User extends Keyed {
 
     const res = await this.retry(async () => {
       const [idRes, nameRes] = await this.kv.getMany([idKey, nameKey]);
-      if (!idRes || !nameRes) {
+      if (!idRes.versionstamp || !nameRes.versionstamp) {
         throw new Error(`Invalid user "${state.id}"`);
       }
 
@@ -84,7 +84,7 @@ export class User extends Keyed {
     });
 
     if (!res.ok) {
-      throw new Error(`Error saving user "${id}"`);
+      throw new Error(`Error deleting user "${id}"`);
     }
   }
 }

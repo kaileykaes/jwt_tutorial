@@ -12,10 +12,17 @@ export interface PayloadTokenSpecfier {
 }
 export type TokenSpecifier = JwtTokenSpecfier | PayloadTokenSpecfier;
 
+/**
+ * A JWT from either a string representation or with a payload that needs
+ * to be turned into a string.
+ */
 export class Token {
   #jwt: string | undefined;
   #payload: State | undefined;
 
+  /**
+   * @param spec Either a string (jwt) or State (payload).
+   */
   constructor(spec: TokenSpecifier) {
     if (spec.jwt) {
       this.#jwt = spec.jwt;
@@ -27,6 +34,12 @@ export class Token {
     }
   }
 
+  /**
+   * Convert the payload to a string.
+   *
+   * @param key The signing key
+   * @returns JWT string
+   */
   async create(key: CryptoKey): Promise<string> {
     if (this.#jwt) {
       return this.#jwt;
@@ -44,11 +57,14 @@ export class Token {
     return this.#jwt;
   }
 
+  /**
+   * Verify the string version and extract the payload.
+   *
+   * @param key The verifying key.
+   * @returns Promise to payload
+   * @throws On invalid token
+   */
   async verify(key: CryptoKey): Promise<State> {
-    if (!this.#payload && !this.#jwt) {
-      throw new Error('Invalid token state');
-    }
-
     const payload = this.#payload ??
       (await jwtVerify(this.#jwt!, key)) as State;
     this.#payload = payload;
@@ -59,16 +75,11 @@ export class Token {
       payload.nbf &&
       payload.exp &&
       payload.sub &&
-      Invalid.instance.isValid(payload)
+      payload.jti &&
+      Invalid.instance.isValid(payload.jti)
     ) {
-      // TODO(hildjj): djwt might already do these checks?
-      const now = new Date().getTime();
-      const nbfDate = payload.nbf * 1000;
-      const expDate = payload.exp * 1000;
-
-      if ((nbfDate < now) && (expDate > now)) {
-        return payload;
-      }
+      // djwt checks nbf and exp
+      return payload;
     }
     throw new Error(`Invalid Token`);
   }

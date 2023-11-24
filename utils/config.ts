@@ -21,6 +21,6 @@ export const REFRESH_DURATION = 3600 * 24 * 7; // It's been...
 export const PASSWORD_SALT_LENGTH = 8;
 
 /**
- * How often to clean up invalid auth tokens.
+ * How often to clean up invalid auth tokens, in ms.
  */
 export const LOGOUT_EXPIRY = 5 * 60 * 1000; // 5m

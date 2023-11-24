@@ -5,7 +5,7 @@
     "start": "deno run --unstable -A --watch=static/,routes/ dev.ts",
     "build": "deno run --unstable -A dev.ts build",
     "preview": "deno run -A main.ts",
-    "test": "rm -rf coverage && deno test -A --unstable --coverage=coverage && deno coverage coverage --lcov --output=coverage/lcov.info && genhtml -o coverage/html --ignore-errors unmapped coverage/lcov.info",
+    "test": "rm -rf coverage && deno test -A --unstable --coverage=coverage && deno coverage coverage --lcov --output=coverage/lcov.info --exclude=test/database/dbUtils.ts && genhtml -o coverage/html --ignore-errors unmapped coverage/lcov.info > /dev/null",
     "ci": "deno test --unstable -A --coverage=coverage && deno coverage coverage --lcov --output=coverage/lcov.info",
     "update": "deno run -A -r https://fresh.deno.dev/update . && deno run -A https://deno.land/x/udd/main.ts deno.jsonc --dry-run"
   },
@@ -47,6 +47,7 @@
     "$std/": "https://deno.land/std@0.206.0/",
     "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
     "djwt": "https://deno.land/x/djwt@v2.4/mod.ts",
+    "heap-js": "https://esm.sh/heap-js@2.3.0",
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.3.1",
     "preact": "https://esm.sh/preact@10.18.1",
     "preact/": "https://esm.sh/preact@10.18.1/",
