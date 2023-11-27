@@ -2,38 +2,63 @@ import { createHandler, type ServeHandlerInfo } from '$fresh/server.ts';
 import manifest from '../fresh.gen.ts';
 import config from '../fresh.config.ts';
 
-const hostname = '127.0.0.1';
-const root = `http://${hostname}`;
+export const hostname = '127.0.0.1';
+export const root = `http://${hostname}`;
 const name = 'hildjjlovespie'; // I mean it could be '_____TESTING_____', but...
 
-export const CONN_INFO: ServeHandlerInfo = {
+const CONN_INFO: ServeHandlerInfo = {
   remoteAddr: { hostname, port: 53496, transport: 'tcp' },
 };
 
-export const HANDLER = await createHandler(manifest, config);
+const HANDLER = await createHandler(manifest, config);
 
-let resp: Response | undefined = undefined;
+export interface SessionInfo {
+  name: string;
+  userId: string;
+  token: string;
+  handle: (req: Request) => Promise<Response>;
+}
+export async function withSession(
+  fn: (session: SessionInfo) => Promise<void>,
+): Promise<void> {
+  const handle = (req: Request) => HANDLER(req, CONN_INFO);
 
-await HANDLER(
-  new Request(`${root}/api/users`, {
-    method: 'POST',
-    body: JSON.stringify({
-      name,
-      password: 'test',
+  // Create user
+  await handle(
+    new Request(`${root}/api/users`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        password: 'test',
+      }),
     }),
-  }),
-  CONN_INFO,
-);
+  );
 
-resp = await HANDLER(
-  new Request(`${root}/api/sessions`, {
-    method: 'POST',
-    body: JSON.stringify({
-      name,
-      password: 'test',
+  const resp = await handle(
+    new Request(`${root}/api/sessions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        password: 'test',
+      }),
     }),
-  }),
-  CONN_INFO,
-);
+  );
+  const { userId, token } = await resp!.json();
 
-export const { userId, token } = await resp!.json();
+  // Actually run the tests
+  await fn({ name, userId, token, handle });
+
+  // Delete user and sessions as side-effect
+  await handle(
+    new Request(`${root}/api/users/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `bearer ${token}`,
+      },
+      body: JSON.stringify({
+        name,
+        password: 'test',
+      }),
+    }),
+  );
+}
