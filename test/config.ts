@@ -45,20 +45,22 @@ export async function withSession(
   );
   const { userId, token } = await resp!.json();
 
-  // Actually run the tests
-  await fn({ name, userId, token, handle });
-
-  // Delete user and sessions as side-effect
-  await handle(
-    new Request(`${root}/api/users/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `bearer ${token}`,
-      },
-      body: JSON.stringify({
-        name,
-        password: 'test',
+  try {
+    // Actually run the tests
+    await fn({ name, userId, token, handle });
+  } finally {
+    // Delete user and sessions as side-effect
+    await handle(
+      new Request(`${root}/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name,
+          password: 'test',
+        }),
       }),
-    }),
-  );
+    );
+  }
 }
