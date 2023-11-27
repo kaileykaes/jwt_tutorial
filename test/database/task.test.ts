@@ -11,7 +11,7 @@ Deno.test('Task', async (t) => {
     //@ts-ignore: testing for bad inputs
     await assertRejects(() => Task.create({}));
 
-    task = await Task.create({
+    await Task.create({
       userId: userId,
       name: 'For real though, wash those greasy cats',
     });
