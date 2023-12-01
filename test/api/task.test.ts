@@ -165,4 +165,3 @@ await Deno.test('Tasks', async (t) => {
 });
 
 // This is a comment to verify I have signed commits working.
-// This is a comment to verify that hell of a solution isn't a permanent rigamarole
