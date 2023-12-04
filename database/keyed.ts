@@ -30,7 +30,7 @@ export class Keyed {
    * Retry the given function N times to avoid transient failures.  Transients
    * might include two instances trying to modify the same record at the same
    * time.  Throw an error from the wrapped function if you want to stop
-   * retrying.  Return {ok: true} on sucess.
+   * retrying.  Return {ok: true} on success.
    *
    * @param fn Function that promises {ok: boolean}.  Most often returns the
    *   result of commit().
