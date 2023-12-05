@@ -2,11 +2,8 @@ import { assertEquals } from '$std/assert/mod.ts';
 import { withSession } from '../config.ts';
 import { failCommit } from '../database/dbUtils.ts';
 
-const hostname = '127.0.0.1';
-const root = `http://${hostname}`;
-
 await Deno.test('Tasks', async (t) => {
-  await withSession(async ({ userId, token, handle }) => {
+  await withSession(async ({ userId, token, root, handle }) => {
     let resp: Response | undefined = undefined;
     const headers = {
       'Authorization': `bearer ${token}`,
