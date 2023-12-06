@@ -4,6 +4,8 @@ import type { State } from '../../../schema/user.ts';
 import type { StoredUserSchema } from '../../../schema/user.ts';
 import { User } from '../../../database/user.ts';
 import { UserUtils } from '../../../controllers/user.ts';
+import { UserAPI } from '../../../schema/user.ts';
+import { errMessage } from '../../../utils/zodparse.ts';
 
 export const handler: Handlers<Response, State> = {
   // Change password
@@ -12,28 +14,24 @@ export const handler: Handlers<Response, State> = {
     let statusText = '';
 
     try {
-      const { password } = await req.json();
-      if (!password || (typeof password !== 'string')) {
-        statusText = 'Invalid password';
-      } else {
-        try {
-          const u: StoredUserSchema = {
-            id: ctx.state.sub!,
-            name: ctx.state.name,
-            roles: ctx.state.roles,
-            password: await UserUtils.hashPassword(password),
-          };
+      const {password} = UserAPI.pick({password: true}).parse(await req.json());
+      try {
+        const u: StoredUserSchema = {
+          id: ctx.state.sub!,
+          name: ctx.state.name,
+          roles: ctx.state.roles,
+          password: await UserUtils.hashPassword(password),
+        };
 
-          await User.update(u);
-          await RefreshToken.logout(u.id);
-          return new Response(JSON.stringify({ id: u.id, name: u.name }));
-        } catch {
-          status = 500;
-          statusText = 'Internal Server Error';
-        }
+        await User.update(u);
+        await RefreshToken.logout(u.id);
+        return new Response(JSON.stringify({ id: u.id, name: u.name }));
+      } catch {
+        status = 500;
+        statusText = 'Internal Server Error';
       }
-    } catch {
-      // Ignore for 400
+    } catch (er) {
+      statusText = errMessage(er);
     }
 
     return new Response(null, {

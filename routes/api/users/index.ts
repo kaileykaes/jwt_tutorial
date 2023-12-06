@@ -1,6 +1,8 @@
 import { Handlers } from '$fresh/server.ts';
 import { User } from '../../../database/user.ts';
+import { UserAPI } from '../../../schema/user.ts';
 import { UserUtils } from '../../../controllers/user.ts';
+import { errMessage } from '../../../utils/zodparse.ts';
 
 export const handler: Handlers = {
   // Create user
@@ -9,36 +11,30 @@ export const handler: Handlers = {
     let statusText = '';
 
     try {
-      const { name, password } = await req.json();
-
+      const {name, password} = UserAPI.parse(await req.json());
       try {
-        if (!name || (typeof name !== 'string')) {
-          statusText = 'Invalid name';
-        } else if (!password || (typeof password !== 'string')) {
-          statusText = 'Invalid password';
-        } else {
-          const hashedPassword = await UserUtils.hashPassword(password);
+        const hashedPassword = await UserUtils.hashPassword(password);
 
-          try {
-            const user = await User.create({
-              name: name,
-              password: hashedPassword,
-            });
+        try {
+          const user = await User.create({
+            name: name,
+            password: hashedPassword,
+          });
 
-            return new Response(
-              JSON.stringify({ id: user.id, name: user.name }),
-            );
-          } catch {
-            status = 409;
-            statusText = 'Duplicate user';
-          }
+          return new Response(
+            JSON.stringify({ id: user.id, name: user.name }),
+          );
+        } catch {
+          status = 409;
+          statusText = 'Duplicate user';
         }
       } catch {
         status = 500;
         statusText = 'Internal server error';
       }
-    } catch {
+    } catch (er) {
       // Ignore for 400
+      statusText = errMessage(er);
     }
     return new Response(JSON.stringify({ statusText }), {
       status,
