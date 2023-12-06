@@ -11,7 +11,7 @@ export const handler: Handlers = {
     let statusText = '';
 
     try {
-      const {name, password} = UserAPI.parse(await req.json());
+      const { name, password } = UserAPI.parse(await req.json());
       try {
         const hashedPassword = await UserUtils.hashPassword(password);
 

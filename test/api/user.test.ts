@@ -171,16 +171,18 @@ await Deno.test('Users', async (t) => {
       CONN_INFO,
     );
     assertEquals(resp.status, 200);
-    const SessionResult = z.array(z.object({
-      jti: z.string().ulid(),
-      iss: z.string().url(),
-      sub: z.string().ulid(),
-      name: z.string().uuid(),
-      roles: z.array(z.string()).length(0),
-      nbf: z.number().gt(0),
-      exp: z.number().gt(0),
-      clientIP: z.string().ip(),
-    }).strict());
+    const SessionResult = z.array(
+      z.object({
+        jti: z.string().ulid(),
+        iss: z.string().url(),
+        sub: z.string().ulid(),
+        name: z.string().uuid(),
+        roles: z.array(z.string()).length(0),
+        nbf: z.number().gt(0),
+        exp: z.number().gt(0),
+        clientIP: z.string().ip(),
+      }).strict(),
+    );
     SessionResult.parse(await resp.json());
   });
 

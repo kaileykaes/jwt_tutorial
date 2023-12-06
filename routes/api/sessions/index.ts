@@ -2,7 +2,10 @@ import { Handlers } from '$fresh/server.ts';
 import { RefreshToken } from '../../../database/refreshToken.ts';
 import { State } from '../../../schema/user.ts';
 import { key, refreshKey } from '../../../utils/apiKey.ts';
-import { type RefreshTokenSchema, RefreshTokenAPI } from '../../../schema/refreshToken.ts';
+import {
+  RefreshTokenAPI,
+  type RefreshTokenSchema,
+} from '../../../schema/refreshToken.ts';
 import { Token } from '../../../controllers/token.ts';
 import { User } from '../../../database/user.ts';
 import { UserAPI } from '../../../schema/user.ts';
@@ -26,7 +29,7 @@ export const handler: Handlers<Response, State> = {
     let statusText = 'Unauthorized';
 
     try {
-      const {name, password} = UserAPI.parse(await req.json());
+      const { name, password } = UserAPI.parse(await req.json());
       const user = await User.readByName(name);
       if (user) {
         if (await UserUtils.isPasswordValid(password, user.password)) {

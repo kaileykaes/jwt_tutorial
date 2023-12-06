@@ -14,7 +14,9 @@ export const handler: Handlers<Response, State> = {
     let statusText = '';
 
     try {
-      const {password} = UserAPI.pick({password: true}).parse(await req.json());
+      const { password } = UserAPI.pick({ password: true }).parse(
+        await req.json(),
+      );
       try {
         const u: StoredUserSchema = {
           id: ctx.state.sub!,

@@ -1,5 +1,5 @@
 import { Payload } from 'djwt';
-import { z } from "zod";
+import { z } from 'zod';
 
 // On the wire
 export interface State extends Payload {
