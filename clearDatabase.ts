@@ -20,3 +20,5 @@ for await (const { key } of Keyed.kv.list({ prefix: [] })) {
   count++;
 }
 console.log(`Deleted ${count} records`);
+
+Deno.exit(count ? 1 : 0);

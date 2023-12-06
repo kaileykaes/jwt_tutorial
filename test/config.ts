@@ -5,6 +5,7 @@ import config from '../fresh.config.ts';
 export const hostname = '127.0.0.1';
 export const root = `http://${hostname}`;
 const name = 'hildjjlovespie'; // I mean it could be '_____TESTING_____', but...
+const password = 'morepie';
 
 const CONN_INFO: ServeHandlerInfo = {
   remoteAddr: { hostname, port: 53496, transport: 'tcp' },
@@ -16,6 +17,7 @@ export interface SessionInfo {
   name: string;
   userId: string;
   token: string;
+  root: string;
   handle: (req: Request) => Promise<Response>;
 }
 export async function withSession(
@@ -29,7 +31,7 @@ export async function withSession(
       method: 'POST',
       body: JSON.stringify({
         name,
-        password: 'test',
+        password,
       }),
     }),
   );
@@ -39,7 +41,7 @@ export async function withSession(
       method: 'POST',
       body: JSON.stringify({
         name,
-        password: 'test',
+        password,
       }),
     }),
   );
@@ -47,7 +49,7 @@ export async function withSession(
 
   try {
     // Actually run the tests
-    await fn({ name, userId, token, handle });
+    await fn({ name, userId, token, root, handle });
   } finally {
     // Delete user and sessions as side-effect
     await handle(
@@ -58,7 +60,7 @@ export async function withSession(
         },
         body: JSON.stringify({
           name,
-          password: 'test',
+          password,
         }),
       }),
     );

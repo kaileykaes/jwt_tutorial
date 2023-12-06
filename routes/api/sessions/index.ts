@@ -2,15 +2,20 @@ import { Handlers } from '$fresh/server.ts';
 import { RefreshToken } from '../../../database/refreshToken.ts';
 import { State } from '../../../schema/user.ts';
 import { key, refreshKey } from '../../../utils/apiKey.ts';
-import { RefreshTokenSchema } from '../../../schema/refreshToken.ts';
+import {
+  RefreshTokenAPI,
+  type RefreshTokenSchema,
+} from '../../../schema/refreshToken.ts';
 import { Token } from '../../../controllers/token.ts';
 import { User } from '../../../database/user.ts';
+import { UserAPI } from '../../../schema/user.ts';
 import { UserUtils } from '../../../controllers/user.ts';
 import {
   AUTH_DURATION,
   CLOCK_SKEW,
   REFRESH_DURATION,
 } from '../../../utils/config.ts';
+import { errMessage } from '../../../utils/zodparse.ts';
 
 export const handler: Handlers<Response, State> = {
   async GET(_req, ctx): Promise<Response> {
@@ -24,52 +29,50 @@ export const handler: Handlers<Response, State> = {
     let statusText = 'Unauthorized';
 
     try {
-      const { name, password } = await req.json();
-      if (name && password) {
-        const user = await User.readByName(name);
-        if (user) {
-          if (await UserUtils.isPasswordValid(password, user.password)) {
-            const now = Math.round(new Date().valueOf() / 1000) - CLOCK_SKEW;
-            const payload: State = {
-              jti: RefreshToken.id(), // For both tokens in the pair
-              iss: new URL('/', req.url).toString(),
-              sub: user.id,
+      const { name, password } = UserAPI.parse(await req.json());
+      const user = await User.readByName(name);
+      if (user) {
+        if (await UserUtils.isPasswordValid(password, user.password)) {
+          const now = Math.round(new Date().valueOf() / 1000) - CLOCK_SKEW;
+          const payload: State = {
+            jti: RefreshToken.id(), // For both tokens in the pair
+            iss: new URL('/', req.url).toString(),
+            sub: user.id,
+            name: user.name,
+            roles: user.roles,
+            nbf: now,
+            exp: now + AUTH_DURATION,
+          };
+
+          const authToken = await new Token({ payload }).create(key);
+          const refreshPayload: RefreshTokenSchema = {
+            ...payload,
+            clientIP: ctx.remoteAddr.hostname,
+            exp: now + REFRESH_DURATION,
+          };
+          const refreshToken = await new Token({ payload: refreshPayload })
+            .create(refreshKey);
+
+          await RefreshToken.create(refreshPayload);
+
+          if (authToken && refreshToken) {
+            return new Response(JSON.stringify({
               name: user.name,
-              roles: user.roles,
-              nbf: now,
-              exp: now + AUTH_DURATION,
-            };
-
-            const authToken = await new Token({ payload }).create(key);
-            const refreshPayload: RefreshTokenSchema = {
-              ...payload,
-              clientIP: ctx.remoteAddr.hostname,
-              exp: now + REFRESH_DURATION,
-            };
-            const refreshToken = await new Token({ payload: refreshPayload })
-              .create(refreshKey);
-
-            await RefreshToken.create(refreshPayload);
-
-            if (authToken && refreshToken) {
-              return new Response(JSON.stringify({
-                name: user.name,
-                userId: user.id,
-                token: authToken,
-                duration: AUTH_DURATION,
-                refreshToken,
-                refreshDuration: REFRESH_DURATION,
-              }));
-            }
-
-            status = 500;
-            statusText = 'Internal server erorr';
+              userId: user.id,
+              token: authToken,
+              duration: AUTH_DURATION,
+              refreshToken,
+              refreshDuration: REFRESH_DURATION,
+            }));
           }
+
+          status = 500;
+          statusText = 'Internal server erorr';
         }
       }
-    } catch (_er) {
+    } catch (er) {
       status = 400;
-      statusText = 'Bad request';
+      statusText = errMessage(er);
     }
 
     return new Response(null, {
@@ -81,7 +84,7 @@ export const handler: Handlers<Response, State> = {
   // Not authorized
   async PUT(req, _ctx): Promise<Response> {
     try {
-      const { refreshToken } = await req.json();
+      const { refreshToken } = RefreshTokenAPI.parse(await req.json());
 
       const prev = await (new Token({ jwt: refreshToken }).verify(
         refreshKey,
