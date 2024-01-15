@@ -16,6 +16,7 @@ export interface SessionInfo {
   name: string;
   userId: string;
   token: string;
+  root: string;
   handle: (req: Request) => Promise<Response>;
 }
 export async function withSession(
@@ -47,7 +48,7 @@ export async function withSession(
 
   try {
     // Actually run the tests
-    await fn({ name, userId, token, handle });
+    await fn({ name, userId, token, root, handle });
   } finally {
     // Delete user and sessions as side-effect
     await handle(
