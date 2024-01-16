@@ -10,11 +10,6 @@ await Deno.test('Tasks', async (t) => {
       'Authorization': `bearer ${token}`,
     };
 
-    const CreateResult = z.object({
-      id: z.string().uuid(),
-      
-    })
-
     await t.step('create', async () => {
       resp = await handle(
         new Request(`${root}/api/tasks`, {
