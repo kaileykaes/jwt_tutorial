@@ -96,13 +96,13 @@ await Deno.test('Tasks', async (t) => {
         }),
       );
       assertEquals(resp.status, 200);
-      CreateResult.parse(await resp.json());
-      // assertEquals(await resp.json(), {
-      //   id: task.id,
-      //   userId: userId,
-      //   name: task.name,
-      //   isCompleted: task.isCompleted,
-      // });
+      // CreateResult.parse(await resp.json());
+      assertEquals(await resp.json(), {
+        id: task.id,
+        userId: userId,
+        name: task.name,
+        isCompleted: task.isCompleted,
+      });
     });
 
     await t.step('update', async () => {
